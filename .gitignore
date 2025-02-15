@@ -1,5 +1,12 @@
 ### Custom ###
 src/main/resources/application-local.yml
+.gitattributes
+gradle
+gradlew
+gradlew.bat
+settings.gradle
+.env
+
 
 HELP.md
 .gradle
