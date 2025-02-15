@@ -1,12 +1,12 @@
 spring:
   r2dbc:
     url: r2dbc:pool:postgres://localhost:5432/psp
-    password: itbatia7104203
-    username: postgres
+    password: ${POSTGRES_PASSWORD}
+    username: ${POSTGRES_USERNAME}
   flyway:
     url: jdbc:postgresql://localhost:5432/psp
-    user: postgres
-    password: itbatia7104203
+    user: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
     locations: classpath:db/migration
 config:
   processing:
