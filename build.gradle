@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "$springBootVersion"
+    id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+}
+
+group = 'com.itbatia'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
+}
+
+dependencies {
+    // spring
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+
+    // flyway
+    implementation "org.flywaydb:flyway-core:$flywayDbVersion"                 // spring + E
+    runtimeOnly "org.flywaydb:flyway-database-postgresql:$flywayDbVersion"     // spring
+
+    // postgres
+//    implementation "io.r2dbc:r2dbc-postgresql:$ioR2dbcVersion"               // E
+    implementation 'org.springframework:spring-jdbc'                           // spring
+    runtimeOnly "org.postgresql:postgresql:$postgresVersion"                   // spring + E
+    runtimeOnly "org.postgresql:r2dbc-postgresql:$orgR2dbcVersion"             // spring
+
+
+//    implementation 'io.r2dbc:r2dbc-pool:1.0.2.RELEASE'
+    implementation 'io.r2dbc:r2dbc-spi:1.0.0.RELEASE'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+
+    // mapstruct
+    implementation "org.mapstruct:mapstruct:$mapStructVersion"                 // E
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"  // E
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'                                     // spring + E
+    annotationProcessor 'org.projectlombok:lombok'                             // spring + E
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'              // spring
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'            // testcontainers
+    testImplementation "org.testcontainers:postgresql:$testcontainersPostgresqlVersion" // testcontainers
+    testImplementation 'org.testcontainers:junit-jupiter'                               // testcontainers
+    testImplementation 'org.testcontainers:r2dbc'                                       // testcontainers
+    testImplementation 'io.projectreactor:reactor-test'                                 // spring
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                        // spring
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
