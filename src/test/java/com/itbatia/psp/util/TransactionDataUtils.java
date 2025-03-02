@@ -1,10 +1,10 @@
 package com.itbatia.psp.util;
 
-
-import com.itbatia.psp.dto.CardDto;
-import com.itbatia.psp.dto.CustomerDto;
 import com.itbatia.psp.dto.TransactionDto;
+import com.itbatia.psp.entity.TransactionEntity;
 import com.itbatia.psp.enums.PaymentMethod;
+import com.itbatia.psp.enums.TranStatus;
+import com.itbatia.psp.enums.TranType;
 
 import java.math.BigDecimal;
 
@@ -15,26 +15,26 @@ public class TransactionDataUtils {
                 .paymentMethod(PaymentMethod.CARD)
                 .amount(BigDecimal.valueOf(100))
                 .currency("BYN")
-                .cardData(getCardDtoTransient())
+                .cardData(CardDataUtils.getIvanIvanovCardDto())
                 .language("en")
                 .notificationUrl("http://localhost:8081/api/v1/webhooks/topup")
-                .customer(getCustomerDtoTransient())
+                .customer(CustomerDataUtils.getCustomerIvanovDto())
                 .build();
     }
 
-    private static CardDto getCardDtoTransient() {
-        return CardDto.builder()
-                .cardNumber("9112831820410277")
-                .expDate("11/25")
-                .cvv(566)
-                .build();
-    }
-
-    private static CustomerDto getCustomerDtoTransient() {
-        return CustomerDto.builder()
-                .firstName("Ivan")
-                .lastName("Ivanov")
-                .country("BY")
+    public static TransactionEntity getTopupTransactionEntityPersisted(String jsonTransactionDto) {
+        return TransactionEntity.builder()
+                .transactionId("12ff5cdd-c4fa-4023-8b48-d3707917e32e")
+                .accountIdFrom(3)
+                .accountIdTo(1)
+                .paymentMethod(PaymentMethod.CARD)
+                .amount(BigDecimal.valueOf(100))
+                .type(TranType.TOPUP)
+                .notificationUrl("http://localhost:8081/api/v1/webhooks/topup")
+                .language("en")
+                .status(TranStatus.SUCCESS)
+                .message("OK")
+                .request(jsonTransactionDto)
                 .build();
     }
 }

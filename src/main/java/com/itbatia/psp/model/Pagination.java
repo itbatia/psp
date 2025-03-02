@@ -27,8 +27,8 @@ public class Pagination {
     }
 
     public void moveToNextPage() {
-        this.totalElements = this.totalElements - this.limit;
-        this.hasNextPage = this.totalElements > this.limit;
-        this.limit = this.hasNextPage ? this.limit : this.totalElements;
+        totalElements = totalElements - limit;
+        hasNextPage = totalElements > limit;
+        limit = hasNextPage ? limit : totalElements;
     }
 }

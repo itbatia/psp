@@ -42,10 +42,9 @@ dependencies {
 
 
 //    implementation 'io.r2dbc:r2dbc-pool:1.0.2.RELEASE'
-    implementation 'io.r2dbc:r2dbc-spi:1.0.0.RELEASE'
+//    implementation 'io.r2dbc:r2dbc-spi:1.0.0.RELEASE'  // ? не помню зачем добавил. Попробовал убрать
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-
 
     // mapstruct
     implementation "org.mapstruct:mapstruct:$mapStructVersion"                 // E
@@ -55,15 +54,16 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'                                     // spring + E
     annotationProcessor 'org.projectlombok:lombok'                             // spring + E
 
-    // test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'              // spring
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'            // testcontainers
-    testImplementation "org.testcontainers:postgresql:$testcontainersPostgresqlVersion" // testcontainers
-    testImplementation 'org.testcontainers:junit-jupiter'                               // testcontainers
-    testImplementation 'org.testcontainers:r2dbc'                                       // testcontainers
-    testImplementation 'io.projectreactor:reactor-test'                                 // spring
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                        // spring
+    // test (spring)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // test (testcontainers)
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation "org.testcontainers:postgresql:$testcontainersPostgresqlVersion"
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:r2dbc'
 }
 
 tasks.named('test') {

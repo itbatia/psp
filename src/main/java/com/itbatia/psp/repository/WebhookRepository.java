@@ -14,12 +14,15 @@ public interface WebhookRepository extends R2dbcRepository<WebhookEntity, Long> 
 
     @Query("SELECT id, transaction_id, notification_url, attempt, request " +
             "FROM data.webhooks AS w " +
-            "WHERE w.to_resend = TRUE AND w.attempt < :max_attempt " +
-            "LIMIT :limit OFFSET :offset " +
-            "FOR UPDATE")
-    Flux<WebhookEntity> findAllUndeliveredWebhooks(@Param("max_attempt") int maxAttempt,
-                                                   @Param("limit") int limit,
-                                                   @Param("offset") long offset);
+            "WHERE w.to_resend = TRUE AND w.attempt < :maxAttempt " +
+            "ORDER BY w.id " +
+            "LIMIT :limit")
+    Flux<WebhookEntity> findAllUndeliveredWebhooks(@Param("maxAttempt") int maxAttempt, @Param("limit") long limit);
+
+    @Query("SELECT COUNT(*) " +
+            "FROM data.webhooks AS w " +
+            "WHERE w.to_resend = TRUE AND w.attempt < :maxAttempt")
+    Mono<Long> getCountUndeliveredWebhooks(@Param("maxAttempt") int maxAttempt);
 
     @Query("INSERT INTO data.webhooks (transaction_id, notification_url, attempt, request, response, response_status, to_resend) " +
             "VALUES (:transactionId, :notificationUrl, :attempt, :request::jsonb, :response::jsonb, :responseStatus, :toResend)")
@@ -32,5 +35,5 @@ public interface WebhookRepository extends R2dbcRepository<WebhookEntity, Long> 
                            boolean toResend);
 
     @Query("UPDATE data.webhooks AS w SET to_resend = FALSE, updated_at = CURRENT_TIMESTAMP WHERE w.id = :id")
-    Mono<Void> updateWebhook(Long id);
+    Mono<Void> markOldWebhookAsNotForSending(Long id);
 }

@@ -31,23 +31,6 @@ public class TransactionRestControllerV1 {
     private final TransactionService transactionService;
     private final UserRepository userRepository;
 
-    @GetMapping("/test")
-    public Mono<ResponseEntity<?>> test(@RequestHeader(MERCHANT_ID) String merchantId,
-                                        @RequestHeader(USER_ID) String userId) {
-        System.out.println("here");
-//        UserEntity userEntity = UserEntity.builder()
-//                .type(UserType.MERCHANT)
-//                .status(Status.ACTIVE)
-//                .build();
-//        return Mono.just(ResponseEntity.ok(userRepository.saveUser(
-//                UserEntity.builder()
-//                        .type(UserType.MERCHANT)
-//                        .status(Status.ACTIVE)
-//                        .build()))
-//        );
-        return Mono.just(ResponseEntity.ok(userRepository.save(UserType.MERCHANT, Status.ACTIVE)));
-    }
-
     @PostMapping("/topup")
     public Mono<ResponseEntity<Response>> createTopup(@RequestHeader(MERCHANT_ID) String merchantId,
                                                       @RequestHeader(USER_ID) String userId,

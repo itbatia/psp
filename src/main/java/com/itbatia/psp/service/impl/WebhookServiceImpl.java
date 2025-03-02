@@ -7,6 +7,7 @@ import com.itbatia.psp.dto.WebhookDto;
 import com.itbatia.psp.entity.TransactionEntity;
 import com.itbatia.psp.entity.WebhookEntity;
 import com.itbatia.psp.model.HttpResponse;
+import com.itbatia.psp.model.Pagination;
 import com.itbatia.psp.repository.WebhookRepository;
 import com.itbatia.psp.service.HttpService;
 import com.itbatia.psp.service.WebhookService;
@@ -16,10 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 import static com.itbatia.psp.Utils.StringPool.ERROR_MSG;
 
@@ -110,27 +108,30 @@ public class WebhookServiceImpl implements WebhookService {
         }
     }
 
-    //////-------------------------------------------  RESEND WEBHOOK  -------------------------------------------//////
+    //////------------------------------------------  RESEND WEBHOOKS  -------------------------------------------//////
 
     @Override
     @Transactional
     public Mono<Void> resendUndeliveredWebhooks() {
-        return findAllUndeliveredWebhooks(webhooksLimit)
+        return webhookRepository.getCountUndeliveredWebhooks(maxAttempt)
+                .map(totalElements -> Pagination.init(webhooksLimit, totalElements))
+                .flatMap(this::processPagesRecursively)
+                .doOnSuccess(e -> log.info("IN resendUndeliveredWebhooks - Resend undelivered webhooks completed"));
+    }
+
+    /**
+     * Recursive page-based transaction processing
+     */
+    private Mono<Void> processPagesRecursively(Pagination pagination) {
+        return webhookRepository.findAllUndeliveredWebhooks(maxAttempt, pagination.getLimit())
                 .flatMap(this::resendAndSaveWebhook)
-                .doOnComplete(() -> log.info("IN resendUndeliveredWebhooks - Resend undelivered webhooks completed"))
-                .then();
-    }
-
-    private Flux<WebhookEntity> findAllUndeliveredWebhooks(int limit) {
-        return fetchPage(0, limit)
-//                .doOnNext(list -> System.out.println("1 Webhook - list.size() = " + list.size())) //TODO del
-                .expand(list -> list.isEmpty() ? Mono.empty() : fetchPage(list.size(), limit))
-//                .doOnNext(list -> System.out.println("2 Webhook - list.size() = " + list.size())) //TODO del
-                .flatMap(Flux::fromIterable);
-    }
-
-    private Mono<List<WebhookEntity>> fetchPage(int offset, int limit) {
-        return webhookRepository.findAllUndeliveredWebhooks(maxAttempt, limit, offset).collectList();
+                .then(Mono.defer(() -> {
+                    if (pagination.hasNextPage()) {
+                        pagination.moveToNextPage();
+                        return processPagesRecursively(pagination);
+                    }
+                    return Mono.empty();
+                }));
     }
 
     private Mono<Void> resendAndSaveWebhook(WebhookEntity webhookEntity) {
@@ -138,8 +139,8 @@ public class WebhookServiceImpl implements WebhookService {
                 .send(webhookEntity.getRequest(), webhookEntity.getNotificationUrl())
                 .onErrorResume(this::defaultHttpResponse)
                 .flatMap(response -> mapToWebhookEntityAndSave(webhookEntity, response))
-                .flatMap(this::updateOldWebhook)
-                .doOnSuccess(empty -> log.info("IN resendAndSaveWebhook - Webhook resent and saved. Attempt={}", webhookEntity.getAttempt()))
+                .flatMap(oldWebhook -> webhookRepository.markOldWebhookAsNotForSending(oldWebhook.getId()))
+                .doOnSuccess(empty -> log.info("IN resendAndSaveWebhook - Webhook with ID={} resent and saved. Attempt={}", webhookEntity.getId(), webhookEntity.getAttempt()))
                 .then();
     }
 
@@ -161,10 +162,6 @@ public class WebhookServiceImpl implements WebhookService {
         return webhookEntity;
     }
 
-    private Mono<Void> updateOldWebhook(WebhookEntity webhookEntity) {
-        return webhookRepository.updateWebhook(webhookEntity.getId());
-    }
-
     //////-------------------------------------------  COMMON METHODS  -------------------------------------------//////
 
     /**
@@ -174,7 +171,7 @@ public class WebhookServiceImpl implements WebhookService {
     private Mono<HttpResponse> defaultHttpResponse(Throwable e) {
         log.error("IN sendAndSaveWebhook - Error during HTTP request to merchant: {}", e.getMessage());
         return Mono.just(HttpResponse.builder()
-                .body(String.format(ERROR_MSG, e.getMessage())) //TODO Если сервак мерча лежит, то такой вариант сойдёт?
+                .body(String.format(ERROR_MSG, e.getMessage())) //TODO Женя. Если сервак мерча лежит, то такой вариант сойдёт?
                 .statusCode(HttpStatusCode.valueOf(500))
                 .build());
     }

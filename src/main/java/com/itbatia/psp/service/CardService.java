@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
  */
 public interface CardService {
 
-    Mono<CardEntity> findByCondition(String cardNumber);
+    Mono<CardEntity> findByCardNumber(String cardNumber);
 
-    Mono<CardEntity> findByCondition(String cardNumber, String expDate, int cvv);
+    Mono<CardEntity> findByCardNumberAndExpDateAndCvv(String cardNumber, String expDate, int cvv);
 }
