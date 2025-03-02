@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono;
  */
 public interface CustomerService {
 
-    Mono<CustomerEntity> findByCondition(String firstName, String lastName, String country);
+    Mono<CustomerEntity> findByFirstNameAndLastNameAndCountry(String firstName, String lastName, String country);
 }

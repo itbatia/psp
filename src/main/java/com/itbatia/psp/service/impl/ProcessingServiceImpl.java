@@ -35,32 +35,18 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final AccountService accountService;
     private final TransactionService transactionService;
 
-//    @Override
-//    public Mono<Void> processTransactions() {
-//        return transactionService.findAllUnprocessedTransactions(limit)
-////        return transactionService.findAllUnprocessedTransactions()
-//                .doOnNext(this::processTransaction)
-//                .flatMap(this::process)
-//                .doOnComplete(() -> log.info("IN processTransactions - Transaction processing completed"))
-//                .then();
-//    }
-//
-//    private Mono<Void> process(TransactionEntity transactionEntity) {
-//        return accountService
-//                .upBalance(getTargetAccountId(transactionEntity), transactionEntity.getAmount())
-//                .then(Mono.defer(() -> transactionService.updateStatusAndMessage(transactionEntity)))
-//                .flatMap(webhookService::sendAndSaveWebhook);
-//    }
-
     @Override
     public Mono<Void> processTransactions() {
         return transactionService.getTotalElementsByStatus(TranStatus.IN_PROGRESS)
                 .map(totalElements -> Pagination.init(limit, totalElements))
-                .flatMap(this::processPage)
+                .flatMap(this::processPagesRecursively)
                 .doOnSuccess(e -> log.info("IN processTransactions - Transaction processing completed"));
     }
 
-    private Mono<Void> processPage(Pagination pagination) {
+    /**
+     * Recursive page-based transaction processing
+     */
+    private Mono<Void> processPagesRecursively(Pagination pagination) {
         return transactionService.findAllUnprocessedTransactions(pagination.getLimit())
                 .doOnNext(this::processTransaction)
                 .flatMap(this::transferFunds)
@@ -69,7 +55,7 @@ public class ProcessingServiceImpl implements ProcessingService {
                 .then(Mono.defer(() -> {
                     if (pagination.hasNextPage()) {
                         pagination.moveToNextPage();
-                        return processPage(pagination);
+                        return processPagesRecursively(pagination);
                     }
                     return Mono.empty();
                 }));

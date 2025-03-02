@@ -118,8 +118,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Mono<CardEntity> findCard(CardDto card, TranType tranType) {
         Mono<CardEntity> cardEntity = switch (tranType) {
-            case PAYOUT -> cardService.findByCondition(card.getCardNumber());
-            case TOPUP -> cardService.findByCondition(card.getCardNumber(), card.getExpDate(), card.getCvv());
+            case PAYOUT -> cardService.findByCardNumber(card.getCardNumber());
+            case TOPUP -> cardService.findByCardNumberAndExpDateAndCvv(card.getCardNumber(), card.getExpDate(), card.getCvv());
         };
 
         return cardEntity.onErrorResume(CardNotFoundException.class, e -> {
@@ -129,7 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<CustomerEntity> findCustomer(CustomerDto customer) {
-        return customerService.findByCondition(customer.getFirstName(), customer.getLastName(), customer.getCountry())
+        return customerService.findByFirstNameAndLastNameAndCountry(customer.getFirstName(), customer.getLastName(), customer.getCountry())
                 .onErrorResume(CustomerNotFoundException.class, e -> {
                     printLog(e.getMessage());
                     return Mono.just(new CustomerEntity());

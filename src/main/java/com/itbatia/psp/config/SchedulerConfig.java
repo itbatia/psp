@@ -38,7 +38,7 @@ public class SchedulerConfig {
     @PostConstruct
     public void startScheduler() {
         transactionsProcessing().subscribe();
-//        webhooksResending().subscribe();
+        webhooksResending().subscribe();
     }
 
     private Flux<Void> transactionsProcessing() {

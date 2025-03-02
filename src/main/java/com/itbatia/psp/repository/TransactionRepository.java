@@ -7,7 +7,6 @@ import com.itbatia.psp.enums.TranType;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.TransactionStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,15 +20,8 @@ public interface TransactionRepository extends R2dbcRepository<TransactionEntity
 
     @Query("INSERT INTO data.transactions (account_id_from, account_id_to, payment_method, amount, type, notification_url, language, request) " +
             "VALUES (:accountIdFrom, :accountIdTo, :paymentMethod, :amount, :tranType, :notificationUrl, :language, :request::jsonb);")
-    Mono<Void> saveTransaction(
-            Long accountIdFrom,
-            Long accountIdTo,
-            PaymentMethod paymentMethod,
-            BigDecimal amount,
-            TranType tranType,
-            String notificationUrl,
-            String language,
-            String request);
+    Mono<Void> saveTransaction(Long accountIdFrom, Long accountIdTo, PaymentMethod paymentMethod, BigDecimal amount,
+                               TranType tranType, String notificationUrl, String language, String request);
 
     Mono<Long> countByStatus(TranStatus status);
 
@@ -45,17 +37,7 @@ public interface TransactionRepository extends R2dbcRepository<TransactionEntity
             "WHERE t.transaction_id = :transactionId")
     Mono<Void> updateStatusAndMessage(TranStatus status, String message, String transactionId);
 
-
-
-    //
-
     Flux<TransactionEntity> findAllByAccountIdToAndCreatedAtBetween(Long accountIdTo, OffsetDateTime startDate, OffsetDateTime endDate);
 
     Flux<TransactionEntity> findAllByAccountIdFromAndCreatedAtBetween(Long accountIdFrom, OffsetDateTime startDate, OffsetDateTime endDate);
-
-    @Query("SELECT transaction_id, account_id_from, account_id_to, payment_method, amount, type, " +
-            "notification_url, language, status, message, request, created_at, updated_at " +
-            "FROM data.transactions AS t " +
-            "WHERE t.status = 'IN_PROGRESS'")
-    Flux<TransactionEntity> findAllUnprocessedTransactions();
 }
