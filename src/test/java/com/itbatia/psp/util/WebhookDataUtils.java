@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 
+/**
+ * @author Batsian_SV
+ */
 public class WebhookDataUtils {
 
     public static WebhookEntity getWebhookPersisted1(String transactionId, String jsonWebhookDto) {

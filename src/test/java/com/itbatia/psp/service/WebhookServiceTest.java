@@ -1,4 +1,4 @@
-package com.itbatia.psp.services;
+package com.itbatia.psp.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +8,6 @@ import com.itbatia.psp.entity.TransactionEntity;
 import com.itbatia.psp.entity.WebhookEntity;
 import com.itbatia.psp.model.HttpResponse;
 import com.itbatia.psp.repository.WebhookRepository;
-import com.itbatia.psp.service.HttpService;
 import com.itbatia.psp.service.impl.WebhookServiceImpl;
 import com.itbatia.psp.util.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,9 +63,9 @@ public class WebhookServiceTest {
         WebhookDto webhookDto = getWebhookDto(transactionId);
         String jsonWebhookDto = MapperUtils.toJson(webhookDto);
         HttpResponse merchantResponse = HttpResponseDataUtils.getSuccessfulMerchantResponse(transactionId);
-        TransactionDto transactionDto = TransactionDataUtils.getTopupTransactionDtoTransient();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionTransient();
         String jsonTransactionDto = MapperUtils.toJson(transactionDto);
-        TransactionEntity transactionEntity = TransactionDataUtils.getTopupTransactionEntityPersisted(jsonTransactionDto);
+        TransactionEntity transactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(jsonTransactionDto);
 
         BDDMockito.given(httpService.send(any(WebhookDto.class), anyString()))
                 .willReturn(Mono.just(merchantResponse));

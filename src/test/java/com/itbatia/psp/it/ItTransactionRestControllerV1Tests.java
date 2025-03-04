@@ -63,7 +63,7 @@ public class ItTransactionRestControllerV1Tests {
         //given
 
         //Users
-        TransactionDto dto = TransactionDataUtils.getTopupTransactionDtoTransient();
+        TransactionDto dto = TransactionDataUtils.getIvanovTopupTransactionTransient();
         UserEntity userMerchant = UserDataUtils.getUserMerchantTransient();
         UserEntity userCustomer = UserDataUtils.getUserCustomerTransient();
         UserEntity savedUserMerchant = userRepository.save(userMerchant).block();

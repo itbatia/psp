@@ -44,7 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Mono<Response> create(TranType tranType, String merchantId, String userId, TransactionDto transactionDto) {
+    public Mono<Response> create(TranType tranType, String merchantId, TransactionDto transactionDto) {
 
         CardDto card = transactionDto.getCardData();
         CustomerDto customer = transactionDto.getCustomer();
@@ -57,11 +57,11 @@ public class TransactionServiceImpl implements TransactionService {
                 .flatMap(tuples -> {
                     CardEntity cardEntity = tuples.getT1();
                     if (cardEntity.isNew())
-                        return Mono.just(buildResponse(TranStatus.FAILED, "INVALID_CARD_DATA"));
+                        return Mono.just(Response.build(TranStatus.FAILED, "INVALID_CARD_DATA"));
 
                     CustomerEntity customerEntity = tuples.getT2();
                     if (customerEntity.isNew())
-                        return Mono.just(buildResponse(TranStatus.FAILED, "INVALID_CUSTOMER_DATA"));
+                        return Mono.just(Response.build(TranStatus.FAILED, "INVALID_CUSTOMER_DATA"));
 
                     return Mono.zip(
                                     findCustomerAccount(customerEntity.getUserId(), currency),
@@ -70,17 +70,17 @@ public class TransactionServiceImpl implements TransactionService {
                             .flatMap(accounts -> {
                                 AccountEntity customerAccount = accounts.getT1();
                                 if (customerAccount.isNew())
-                                    return Mono.just(buildResponse(TranStatus.FAILED, "CUSTOMER_DOES_NOT_HAVE_ACCOUNT"));
+                                    return Mono.just(Response.build(TranStatus.FAILED, "CUSTOMER_DOES_NOT_HAVE_ACCOUNT"));
 
                                 AccountEntity merchantAccount = accounts.getT2();
                                 if (merchantAccount.isNew())
-                                    return Mono.just(buildResponse(TranStatus.FAILED, "MERCHANT_DOES_NOT_HAVE_ACCOUNT"));
+                                    return Mono.just(Response.build(TranStatus.FAILED, "MERCHANT_DOES_NOT_HAVE_ACCOUNT"));
 
                                 if (!cardEntity.getAccountId().equals(customerAccount.getId()))
-                                    return Mono.just(buildResponse(TranStatus.FAILED, "INVALID_CARD_DATA"));
+                                    return Mono.just(Response.build(TranStatus.FAILED, "INVALID_CARD_DATA"));
 
                                 if (!cardEntity.getCardStatus().equals(CardStatus.ACTIVE))
-                                    return Mono.just(buildResponse(TranStatus.FAILED, "CARD_IS_" + cardEntity.getCardStatus()));
+                                    return Mono.just(Response.build(TranStatus.FAILED, "CARD_IS_" + cardEntity.getCardStatus()));
 
                                 return processTransaction(tranType, transactionDto, customerAccount, merchantAccount);
                             });
@@ -93,17 +93,18 @@ public class TransactionServiceImpl implements TransactionService {
         AccountEntity accountTo = tranType.equals(TranType.TOPUP) ? merchantAccount : customerAccount;   // Транзакция снятия: переводим от мерча к кастомеру
 
         if (accountFrom.getBalance().compareTo(amount) < 0)
-            return Mono.just(buildResponse(TranStatus.FAILED, "INSUFFICIENT_FUNDS"));
+            return Mono.just(Response.build(TranStatus.FAILED, "INSUFFICIENT_FUNDS"));
 
         accountFrom.setBalance(accountFrom.getBalance().subtract(amount));
 
         return accountService
                 .update(accountFrom)
                 .flatMap(updatedAccounts -> saveTransaction(tranType, transactionDto, accountFrom, accountTo)
-                        .then(Mono.fromCallable(() -> buildResponse(TranStatus.IN_PROGRESS, "OK"))));
+                        .map(transactionEntity -> Response.build(transactionEntity.getTransactionId(), TranStatus.IN_PROGRESS, "OK"))
+                );
     }
 
-    private Mono<Void> saveTransaction(TranType tranType, TransactionDto transactionDto, AccountEntity accountFrom, AccountEntity accountTo) {
+    private Mono<TransactionEntity> saveTransaction(TranType tranType, TransactionDto transactionDto, AccountEntity accountFrom, AccountEntity accountTo) {
         return transactionRepository.saveTransaction(
                 accountFrom.getId(),
                 accountTo.getId(),
@@ -150,13 +151,6 @@ public class TransactionServiceImpl implements TransactionService {
                     printLog(e.getMessage());
                     return Mono.just(new AccountEntity());
                 });
-    }
-
-    private Response buildResponse(TranStatus status, String message) {
-        return Response.builder()
-                .status(status)
-                .message(message)
-                .build();
     }
 
     //////---------------------------------------------  GET_BY_ID  ----------------------------------------------//////

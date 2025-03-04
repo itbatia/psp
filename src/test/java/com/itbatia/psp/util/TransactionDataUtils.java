@@ -8,9 +8,12 @@ import com.itbatia.psp.enums.TranType;
 
 import java.math.BigDecimal;
 
+/**
+ * @author Batsian_SV
+ */
 public class TransactionDataUtils {
 
-    public static TransactionDto getTopupTransactionDtoTransient() {
+    public static TransactionDto getIvanovTopupTransactionTransient() {
         return TransactionDto.builder()
                 .paymentMethod(PaymentMethod.CARD)
                 .amount(BigDecimal.valueOf(100))
@@ -22,11 +25,11 @@ public class TransactionDataUtils {
                 .build();
     }
 
-    public static TransactionEntity getTopupTransactionEntityPersisted(String jsonTransactionDto) {
+    public static TransactionEntity getIvanovTopupTransactionPersisted(String jsonTransactionDto) {
         return TransactionEntity.builder()
                 .transactionId("12ff5cdd-c4fa-4023-8b48-d3707917e32e")
-                .accountIdFrom(3)
-                .accountIdTo(1)
+                .accountIdFrom(AccountDataUtils.CUSTOMER_IVANOV_BYN_ACCOUNT_ID)
+                .accountIdTo(AccountDataUtils.MERCHANT_SMIRNOV_BYN_ACCOUNT_ID)
                 .paymentMethod(PaymentMethod.CARD)
                 .amount(BigDecimal.valueOf(100))
                 .type(TranType.TOPUP)

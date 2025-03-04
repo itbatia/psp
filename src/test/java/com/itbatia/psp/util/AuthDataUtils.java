@@ -5,6 +5,9 @@ import org.springframework.http.HttpHeaders;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author Batsian_SV
+ */
 public class AuthDataUtils {
 
     public static String getMerchantBasicAuth(MerchantEntity merchantEntity) {

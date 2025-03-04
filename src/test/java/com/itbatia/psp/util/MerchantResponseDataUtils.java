@@ -3,6 +3,9 @@ package com.itbatia.psp.util;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpStatus;
 
+/**
+ * @author Batsian_SV
+ */
 public class MerchantResponseDataUtils {
 
     public static String getSuccessfulMerchantResponseBody(String transactionId) {

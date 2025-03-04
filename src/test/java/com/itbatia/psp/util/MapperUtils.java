@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
+/**
+ * @author Batsian_SV
+ */
 public class MapperUtils {
 
     private final static ObjectMapper objectMapper = objectMapper();
