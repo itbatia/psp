@@ -3,6 +3,9 @@ package com.itbatia.psp.util;
 import com.itbatia.psp.model.HttpResponse;
 import org.springframework.http.HttpStatus;
 
+/**
+ * @author Batsian_SV
+ */
 public class HttpResponseDataUtils {
 
     public static HttpResponse getSuccessfulMerchantResponse(String transactionId) {

@@ -20,9 +20,9 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
 
     @Override
-    public Mono<CustomerEntity> findByFirstNameAndLastNameAndCountry(String firstName, String lastName, String country) {
+    public Mono<CustomerEntity> findByFirstNameAndLastNameAndCountry(String firstName, String lastName, String country) throws CustomerNotFoundException {
         return customerRepository
                 .findByFirstNameIgnoreCaseAndLastNameIgnoreCaseAndCountryIgnoreCase(firstName, lastName, country)
-                .switchIfEmpty(Mono.error(new CustomerNotFoundException("IN findByCondition - Customer not found")));
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException("IN findByFirstNameAndLastNameAndCountry - Customer not found")));
     }
 }

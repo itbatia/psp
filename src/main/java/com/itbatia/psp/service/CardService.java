@@ -1,6 +1,7 @@
 package com.itbatia.psp.service;
 
 import com.itbatia.psp.entity.CardEntity;
+import com.itbatia.psp.exception.CardNotFoundException;
 import reactor.core.publisher.Mono;
 
 /**
@@ -8,7 +9,7 @@ import reactor.core.publisher.Mono;
  */
 public interface CardService {
 
-    Mono<CardEntity> findByCardNumber(String cardNumber);
+    Mono<CardEntity> findByCardNumber(String cardNumber) throws CardNotFoundException;
 
-    Mono<CardEntity> findByCardNumberAndExpDateAndCvv(String cardNumber, String expDate, int cvv);
+    Mono<CardEntity> findByCardNumberAndExpDateAndCvv(String cardNumber, String expDate, int cvv) throws CardNotFoundException;
 }

@@ -33,16 +33,14 @@ public class TransactionRestControllerV1 {
 
     @PostMapping("/topup")
     public Mono<ResponseEntity<Response>> createTopup(@RequestHeader(MERCHANT_ID) String merchantId,
-                                                      @RequestHeader(USER_ID) String userId,
                                                       @RequestBody TransactionDto dto) {
-        return transactionService.create(TranType.TOPUP, merchantId, userId, dto).flatMap(this::buildResponse);
+        return transactionService.create(TranType.TOPUP, merchantId, dto).flatMap(this::buildResponse);
     }
 
     @PostMapping("/payout")
     public Mono<ResponseEntity<Response>> createPayout(@RequestHeader(MERCHANT_ID) String merchantId,
-                                                       @RequestHeader(USER_ID) String userId,
                                                        @RequestBody TransactionDto dto) {
-        return transactionService.create(TranType.PAYOUT, merchantId, userId, dto).flatMap(this::buildResponse);
+        return transactionService.create(TranType.PAYOUT, merchantId, dto).flatMap(this::buildResponse);
     }
 
     @GetMapping("/topup/{transaction_id}/details")

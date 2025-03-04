@@ -32,7 +32,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Mono<AccountEntity> findByUserIdAndCurrency(long userId, String currency) {
+    public Mono<AccountEntity> findByUserIdAndCurrency(long userId, String currency) throws AccountNotFoundException {
         return accountRepository
                 .findByUserIdAndCurrency(userId, currency)
                 .switchIfEmpty(Mono.error(new AccountNotFoundException("IN findByUserIdAndCurrency - Account not found")));

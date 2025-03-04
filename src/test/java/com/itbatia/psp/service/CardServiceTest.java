@@ -1,4 +1,4 @@
-package com.itbatia.psp.services;
+package com.itbatia.psp.service;
 
 import com.itbatia.psp.entity.CardEntity;
 import com.itbatia.psp.exception.CardNotFoundException;

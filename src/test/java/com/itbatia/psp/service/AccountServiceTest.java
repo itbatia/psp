@@ -1,4 +1,4 @@
-package com.itbatia.psp.services;
+package com.itbatia.psp.service;
 
 import com.itbatia.psp.entity.AccountEntity;
 import com.itbatia.psp.exception.AccountNotFoundException;
@@ -43,7 +43,7 @@ public class AccountServiceTest {
     public void givenUserId_whenGetAccountsByUserId_thenAccountsIsReturned() {
         //given
         BDDMockito.given(accountRepository.findByUserId(anyLong()))
-                .willReturn(Flux.just(AccountDataUtils.getSmirnovBYNAccountPersisted(), AccountDataUtils.getSmirnovRUBAccountPersisted()));
+                .willReturn(Flux.just(AccountDataUtils.getMerchantSmirnovBYNAccountPersisted(), AccountDataUtils.getMerchantSmirnovRUBAccountPersisted()));
         //when
         List<AccountEntity> accountEntities = accountServiceUnderTest.findByUserId(1).collectList().block();
         //then
@@ -67,7 +67,7 @@ public class AccountServiceTest {
     public void givenUserIdAndCurrency_whenGetAccountByUserIdAndCurrency_thenAccountIsReturned() {
         //given
         BDDMockito.given(accountRepository.findByUserIdAndCurrency(anyLong(), anyString()))
-                .willReturn(Mono.just(AccountDataUtils.getSmirnovBYNAccountPersisted()));
+                .willReturn(Mono.just(AccountDataUtils.getMerchantSmirnovBYNAccountPersisted()));
         //when
         AccountEntity accountEntity = accountServiceUnderTest.findByUserIdAndCurrency(1, "BYN").block();
         //then
@@ -106,7 +106,7 @@ public class AccountServiceTest {
     @DisplayName("Test update account functionality")
     public void givenAccount_whenUpdate_thenRepositoryIsCalled() {
         //given
-        AccountEntity accountToUpdate = AccountDataUtils.getSmirnovBYNAccountPersisted();
+        AccountEntity accountToUpdate = AccountDataUtils.getMerchantSmirnovBYNAccountPersisted();
         BDDMockito.given(accountRepository.save(any(AccountEntity.class)))
                 .willReturn(Mono.just(accountToUpdate));
         //when

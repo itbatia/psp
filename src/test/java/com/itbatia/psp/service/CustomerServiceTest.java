@@ -1,4 +1,4 @@
-package com.itbatia.psp.services;
+package com.itbatia.psp.service;
 
 import com.itbatia.psp.entity.CustomerEntity;
 import com.itbatia.psp.exception.CustomerNotFoundException;
