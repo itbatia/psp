@@ -25,17 +25,19 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
 
     @Override
-    public Flux<AccountEntity> findByUserId(long userId) {
+    public Flux<AccountEntity> findByUserId(long userId) throws AccountNotFoundException {
         return accountRepository
                 .findByUserId(userId)
-                .switchIfEmpty(Mono.error(new AccountNotFoundException("IN findByUserId - Account not found")));
+                .switchIfEmpty(Mono.error(new AccountNotFoundException("Account not found")))
+                .doOnError(AccountNotFoundException.class, e -> log.error("IN findByUserId - {}", e.getMessage()));
     }
 
     @Override
     public Mono<AccountEntity> findByUserIdAndCurrency(long userId, String currency) throws AccountNotFoundException {
         return accountRepository
                 .findByUserIdAndCurrency(userId, currency)
-                .switchIfEmpty(Mono.error(new AccountNotFoundException("IN findByUserIdAndCurrency - Account not found")));
+                .switchIfEmpty(Mono.error(new AccountNotFoundException("Account not found")))
+                .doOnError(AccountNotFoundException.class, e -> log.error("IN findByUserIdAndCurrency - {}", e.getMessage()));
     }
 
     @Override

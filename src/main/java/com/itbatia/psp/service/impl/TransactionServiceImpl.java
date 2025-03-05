@@ -70,11 +70,11 @@ public class TransactionServiceImpl implements TransactionService {
                             .flatMap(accounts -> {
                                 AccountEntity customerAccount = accounts.getT1();
                                 if (customerAccount.isNew())
-                                    return Mono.just(Response.build(TranStatus.FAILED, "CUSTOMER_DOES_NOT_HAVE_ACCOUNT"));
+                                    return Mono.just(Response.build(TranStatus.FAILED, "CUSTOMER_DOES_NOT_HAVE_ACCOUNT_IN_SPECIFIED_CURRENCY"));
 
                                 AccountEntity merchantAccount = accounts.getT2();
                                 if (merchantAccount.isNew())
-                                    return Mono.just(Response.build(TranStatus.FAILED, "MERCHANT_DOES_NOT_HAVE_ACCOUNT"));
+                                    return Mono.just(Response.build(TranStatus.FAILED, "MERCHANT_DOES_NOT_HAVE_ACCOUNT_IN_SPECIFIED_CURRENCY"));
 
                                 if (!cardEntity.getAccountId().equals(customerAccount.getId()))
                                     return Mono.just(Response.build(TranStatus.FAILED, "INVALID_CARD_DATA"));

@@ -8,11 +8,15 @@ import com.itbatia.psp.entity.CustomerEntity;
  */
 public class CustomerDataUtils {
 
+    public static final String IVANOV_FIRST_NAME = "Ivan";
+    public static final String IVANOV_LAST_NAME = "Ivanov";
+    public static final String IVANOV_COUNTRY = "BY";
+
     public static CustomerEntity getCustomerIvanovTransient() {
         return CustomerEntity.builder()
-                .firstName("Ivan")
-                .lastName("Ivanov")
-                .country("BY")
+                .firstName(IVANOV_FIRST_NAME)
+                .lastName(IVANOV_LAST_NAME)
+                .country(IVANOV_COUNTRY)
                 .build();
     }
 
@@ -20,17 +24,17 @@ public class CustomerDataUtils {
         return CustomerEntity.builder()
                 .id(1L)
                 .userId(UserDataUtils.CUSTOMER_USER_ID)
-                .firstName("Ivan")
-                .lastName("Ivanov")
-                .country("BY")
+                .firstName(IVANOV_FIRST_NAME)
+                .lastName(IVANOV_LAST_NAME)
+                .country(IVANOV_COUNTRY)
                 .build();
     }
 
     public static CustomerDto getCustomerIvanovDto() {
         return CustomerDto.builder()
-                .firstName("Ivan")
-                .lastName("Ivanov")
-                .country("BY")
+                .firstName(IVANOV_FIRST_NAME)
+                .lastName(IVANOV_LAST_NAME)
+                .country(IVANOV_COUNTRY)
                 .build();
     }
 }

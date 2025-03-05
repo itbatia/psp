@@ -23,13 +23,15 @@ public class CardServiceImpl implements CardService {
     public Mono<CardEntity> findByCardNumber(String cardNumber) throws CardNotFoundException {
         return cardRepository
                 .findByCardNumber(cardNumber)
-                .switchIfEmpty(Mono.error(new CardNotFoundException("IN findByCardNumber - Card not found")));
+                .switchIfEmpty(Mono.error(new CardNotFoundException("Card not found")))
+                .doOnError(CardNotFoundException.class, e -> log.error("IN findByCardNumber - {}", e.getMessage()));
     }
 
     @Override
     public Mono<CardEntity> findByCardNumberAndExpDateAndCvv(String cardNumber, String expDate, int cvv) throws CardNotFoundException {
         return cardRepository
                 .findByCardNumberAndExpDateAndCvv(cardNumber, expDate, cvv)
-                .switchIfEmpty(Mono.error(new CardNotFoundException("IN findByCardNumberAndExpDateAndCvv - Card not found")));
+                .switchIfEmpty(Mono.error(new CardNotFoundException("Card not found")))
+                .doOnError(CardNotFoundException.class, e -> log.error("IN findByCardNumberAndExpDateAndCvv - {}", e.getMessage()));
     }
 }

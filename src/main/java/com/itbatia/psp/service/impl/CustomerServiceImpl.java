@@ -23,6 +23,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Mono<CustomerEntity> findByFirstNameAndLastNameAndCountry(String firstName, String lastName, String country) throws CustomerNotFoundException {
         return customerRepository
                 .findByFirstNameIgnoreCaseAndLastNameIgnoreCaseAndCountryIgnoreCase(firstName, lastName, country)
-                .switchIfEmpty(Mono.error(new CustomerNotFoundException("IN findByFirstNameAndLastNameAndCountry - Customer not found")));
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException("Customer not found")))
+                .doOnError(CustomerNotFoundException.class, e -> log.error("IN findByFirstNameAndLastNameAndCountry - {}", e.getMessage()));
     }
 }

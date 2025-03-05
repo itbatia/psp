@@ -3,6 +3,7 @@ package com.itbatia.psp.util;
 import com.itbatia.psp.dto.CardDto;
 import com.itbatia.psp.entity.CardEntity;
 import com.itbatia.psp.enums.CardStatus;
+import com.itbatia.psp.enums.TranType;
 
 /**
  * @author Batsian_SV
@@ -33,11 +34,33 @@ public class CardDataUtils {
                 .build();
     }
 
-    public static CardDto getIvanIvanovCardDto() {
+    public static CardEntity getBlockedIvanIvanovCardTransient() {
+        return CardEntity.builder()
+                .cardNumber(IVANOV_CARD_NUMBER)
+                .expDate(IVANOV_CARD_EXP_DATE)
+                .cvv(IVANOV_CARD_CVV)
+                .cardStatus(CardStatus.ACTIVE)
+                .build();
+    }
+
+    public static CardDto getIvanIvanovCardDto(TranType tranType) {
+        return switch (tranType) {
+            case TOPUP -> buildIvanIvanovCardDto1();
+            case PAYOUT -> buildIvanIvanovCardDto2();
+        };
+    }
+
+    private static CardDto buildIvanIvanovCardDto1() {
         return CardDto.builder()
                 .cardNumber(IVANOV_CARD_NUMBER)
                 .expDate(IVANOV_CARD_EXP_DATE)
                 .cvv(IVANOV_CARD_CVV)
+                .build();
+    }
+
+    private static CardDto buildIvanIvanovCardDto2() {
+        return CardDto.builder()
+                .cardNumber(IVANOV_CARD_NUMBER)
                 .build();
     }
 }
