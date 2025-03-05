@@ -14,15 +14,11 @@ import java.math.BigDecimal;
 public class TransactionDataUtils {
 
     public static TransactionDto getIvanovTopupTransactionTransient() {
-        return TransactionDto.builder()
-                .paymentMethod(PaymentMethod.CARD)
-                .amount(BigDecimal.valueOf(100))
-                .currency("BYN")
-                .cardData(CardDataUtils.getIvanIvanovCardDto())
-                .language("en")
-                .notificationUrl("http://localhost:8081/api/v1/webhooks/topup")
-                .customer(CustomerDataUtils.getCustomerIvanovDto())
-                .build();
+        return getIvanovTransactionTransient(TranType.TOPUP);
+    }
+
+    public static TransactionDto getIvanovPayoutTransactionTransient() {
+        return getIvanovTransactionTransient(TranType.PAYOUT);
     }
 
     public static TransactionEntity getIvanovTopupTransactionPersisted(String jsonTransactionDto) {
@@ -38,6 +34,34 @@ public class TransactionDataUtils {
                 .status(TranStatus.SUCCESS)
                 .message("OK")
                 .request(jsonTransactionDto)
+                .build();
+    }
+
+    public static TransactionEntity getIvanovPayoutTransactionPersisted(String jsonTransactionDto) {
+        return TransactionEntity.builder()
+                .transactionId("12ff5cdd-c4fa-4023-8b48-d3707917e32e")
+                .accountIdFrom(AccountDataUtils.MERCHANT_SMIRNOV_BYN_ACCOUNT_ID)
+                .accountIdTo(AccountDataUtils.CUSTOMER_IVANOV_BYN_ACCOUNT_ID)
+                .paymentMethod(PaymentMethod.CARD)
+                .amount(BigDecimal.valueOf(100))
+                .type(TranType.PAYOUT)
+                .notificationUrl("http://localhost:8081/api/v1/webhooks/payout")
+                .language("en")
+                .status(TranStatus.SUCCESS)
+                .message("OK")
+                .request(jsonTransactionDto)
+                .build();
+    }
+
+    private static TransactionDto getIvanovTransactionTransient(TranType tranType) {
+        return TransactionDto.builder()
+                .paymentMethod(PaymentMethod.CARD)
+                .amount(BigDecimal.valueOf(100))
+                .currency("BYN")
+                .cardData(CardDataUtils.getIvanIvanovCardDto(tranType))
+                .language("en")
+                .notificationUrl("http://localhost:8081/api/v1/webhooks/topup")
+                .customer(CustomerDataUtils.getCustomerIvanovDto())
                 .build();
     }
 }

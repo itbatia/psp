@@ -1,13 +1,9 @@
 package com.itbatia.psp.rest;
 
 import com.itbatia.psp.dto.TransactionDto;
-import com.itbatia.psp.entity.UserEntity;
-import com.itbatia.psp.enums.Status;
 import com.itbatia.psp.enums.TranStatus;
 import com.itbatia.psp.enums.TranType;
-import com.itbatia.psp.enums.UserType;
 import com.itbatia.psp.model.Response;
-import com.itbatia.psp.repository.UserRepository;
 import com.itbatia.psp.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,8 +24,9 @@ import static com.itbatia.psp.Utils.StringPool.*;
 @RequestMapping("/api/v1/payments")
 public class TransactionRestControllerV1 {
 
+    //TODO Exceptions переписать в handler
+
     private final TransactionService transactionService;
-    private final UserRepository userRepository;
 
     @PostMapping("/topup")
     public Mono<ResponseEntity<Response>> createTopup(@RequestHeader(MERCHANT_ID) String merchantId,

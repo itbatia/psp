@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  */
 public interface AccountService {
 
-    Flux<AccountEntity> findByUserId(long userId);
+    Flux<AccountEntity> findByUserId(long userId) throws AccountNotFoundException;
 
     Mono<AccountEntity> findByUserIdAndCurrency(long userId, String currency) throws AccountNotFoundException;
 

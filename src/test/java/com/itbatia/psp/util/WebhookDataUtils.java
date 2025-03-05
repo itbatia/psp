@@ -47,7 +47,7 @@ public class WebhookDataUtils {
                 .amount(BigDecimal.valueOf(100))
                 .currency("BYN")
                 .type(TranType.TOPUP)
-                .cardData(CardDataUtils.getIvanIvanovCardDto())
+                .cardData(CardDataUtils.getIvanIvanovCardDto(TranType.TOPUP))
                 .language("en")
                 .customer(CustomerDataUtils.getCustomerIvanovDto())
                 .status(TranStatus.SUCCESS)
