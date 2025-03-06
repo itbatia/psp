@@ -12,6 +12,7 @@ public class AccountDataUtils {
     public static final long MERCHANT_SMIRNOV_BYN_ACCOUNT_ID = 1;
     public static final long MERCHANT_SMIRNOV_RUB_ACCOUNT_ID = 2;
     public static final long CUSTOMER_IVANOV_BYN_ACCOUNT_ID = 3;
+    public static final long CUSTOMER_PETROV_BYN_ACCOUNT_ID = 4;
 
     public static AccountEntity getMerchantSmirnovBYNAccountPersisted() {
         return buildMerchantSmirnovBYNAccountPersisted(BigDecimal.valueOf(1000));
@@ -42,7 +43,7 @@ public class AccountDataUtils {
     private static AccountEntity buildCustomerIvanovBYNAccountPersisted(BigDecimal balance) {
         return AccountEntity.builder()
                 .id(CUSTOMER_IVANOV_BYN_ACCOUNT_ID)
-                .userId(UserDataUtils.CUSTOMER_USER_ID)
+                .userId(UserDataUtils.CUSTOMER_IVANOV_USER_ID)
                 .number("BY03CUSTOM30140900044303134462")
                 .balance(balance)
                 .currency("BYN")

@@ -59,6 +59,9 @@ public class TransactionServiceImpl implements TransactionService {
                     if (cardEntity.isNew())
                         return Mono.just(Response.build(TranStatus.FAILED, "INVALID_CARD_DATA"));
 
+                    if (!cardEntity.getCardStatus().equals(CardStatus.ACTIVE))
+                        return Mono.just(Response.build(TranStatus.FAILED, "CARD_IS_" + cardEntity.getCardStatus()));
+
                     CustomerEntity customerEntity = tuples.getT2();
                     if (customerEntity.isNew())
                         return Mono.just(Response.build(TranStatus.FAILED, "INVALID_CUSTOMER_DATA"));
@@ -77,10 +80,7 @@ public class TransactionServiceImpl implements TransactionService {
                                     return Mono.just(Response.build(TranStatus.FAILED, "MERCHANT_DOES_NOT_HAVE_ACCOUNT_IN_SPECIFIED_CURRENCY"));
 
                                 if (!cardEntity.getAccountId().equals(customerAccount.getId()))
-                                    return Mono.just(Response.build(TranStatus.FAILED, "INVALID_CARD_DATA"));
-
-                                if (!cardEntity.getCardStatus().equals(CardStatus.ACTIVE))
-                                    return Mono.just(Response.build(TranStatus.FAILED, "CARD_IS_" + cardEntity.getCardStatus()));
+                                    return Mono.just(Response.build(TranStatus.FAILED, "CUSTOMER_IS_NOT_OWNER_OF_THIS_CARD"));
 
                                 return processTransaction(tranType, transactionDto, customerAccount, merchantAccount);
                             });
@@ -213,22 +213,15 @@ public class TransactionServiceImpl implements TransactionService {
     //////-----------------------------------------------  MAPPER  -----------------------------------------------//////
 
     private TransactionDto toDto(TransactionEntity transactionEntity) throws JsonConversionException {
-        TransactionDto request = fromJson(transactionEntity.getRequest());
+        TransactionDto dto = fromJson(transactionEntity.getRequest());
 
-        return TransactionDto.builder()
-                .transactionId(transactionEntity.getTransactionId())
-                .paymentMethod(transactionEntity.getPaymentMethod())
-                .amount(transactionEntity.getAmount())
-                .currency(request.getCurrency())
-                .createdAt(transactionEntity.getCreatedAt())
-                .updatedAt(transactionEntity.getUpdatedAt())
-                .notificationUrl(transactionEntity.getNotificationUrl())
-                .cardData(request.getCardData())
-                .language(request.getLanguage())
-                .customer(request.getCustomer())
-                .status(transactionEntity.getStatus())
-                .message(transactionEntity.getMessage())
-                .build();
+        dto.setTransactionId(transactionEntity.getTransactionId());
+        dto.setStatus(transactionEntity.getStatus());
+        dto.setMessage(transactionEntity.getMessage());
+        dto.setCreatedAt(transactionEntity.getCreatedAt());
+        dto.setUpdatedAt(transactionEntity.getUpdatedAt());
+
+        return dto;
     }
 
     private String toJson(TransactionDto dto) {

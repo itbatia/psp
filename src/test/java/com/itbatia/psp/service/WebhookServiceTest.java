@@ -63,7 +63,7 @@ public class WebhookServiceTest {
         WebhookDto webhookDto = getWebhookDto(transactionId);
         String jsonWebhookDto = MapperUtils.toJson(webhookDto);
         HttpResponse merchantResponse = HttpResponseDataUtils.getSuccessfulMerchantResponse(transactionId);
-        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionTransient();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
         String jsonTransactionDto = MapperUtils.toJson(transactionDto);
         TransactionEntity transactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(jsonTransactionDto);
 

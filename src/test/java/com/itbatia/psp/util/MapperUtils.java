@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.itbatia.psp.dto.TransactionDto;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
@@ -19,6 +20,10 @@ public class MapperUtils {
 
     public static String toJson(Object object) throws JsonProcessingException {
         return objectMapper.writeValueAsString(object);
+    }
+
+    public static TransactionDto fromJson(String json) throws JsonProcessingException {
+        return objectMapper.readValue(json, TransactionDto.class);
     }
 
     public static ObjectNode initJsonObject() {
