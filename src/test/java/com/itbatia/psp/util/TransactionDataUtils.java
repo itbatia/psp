@@ -13,12 +13,12 @@ import java.math.BigDecimal;
  */
 public class TransactionDataUtils {
 
-    public static TransactionDto getIvanovTopupTransactionTransient() {
-        return getIvanovTransactionTransient(TranType.TOPUP);
+    public static TransactionDto getIvanovTopupTransactionDtoIN() {
+        return getIvanovTransactionDto(TranType.TOPUP);
     }
 
-    public static TransactionDto getIvanovPayoutTransactionTransient() {
-        return getIvanovTransactionTransient(TranType.PAYOUT);
+    public static TransactionDto getIvanovPayoutTransactionDtoIN() {
+        return getIvanovTransactionDto(TranType.PAYOUT);
     }
 
     public static TransactionEntity getIvanovTopupTransactionPersisted(String jsonTransactionDto) {
@@ -34,6 +34,8 @@ public class TransactionDataUtils {
                 .status(TranStatus.SUCCESS)
                 .message("OK")
                 .request(jsonTransactionDto)
+                .createdAt(DateTimeUtils.getCreatedAt())
+                .updatedAt(DateTimeUtils.getUpdatedAt())
                 .build();
     }
 
@@ -50,10 +52,12 @@ public class TransactionDataUtils {
                 .status(TranStatus.SUCCESS)
                 .message("OK")
                 .request(jsonTransactionDto)
+                .createdAt(DateTimeUtils.getCreatedAt())
+                .updatedAt(DateTimeUtils.getUpdatedAt())
                 .build();
     }
 
-    private static TransactionDto getIvanovTransactionTransient(TranType tranType) {
+    private static TransactionDto getIvanovTransactionDto(TranType tranType) {
         return TransactionDto.builder()
                 .paymentMethod(PaymentMethod.CARD)
                 .amount(BigDecimal.valueOf(100))
@@ -62,6 +66,23 @@ public class TransactionDataUtils {
                 .language("en")
                 .notificationUrl("http://localhost:8081/api/v1/webhooks/topup")
                 .customer(CustomerDataUtils.getCustomerIvanovDto())
+                .build();
+    }
+
+    public static TransactionDto getIvanovTopupTransactionDtoOUT() {
+        return TransactionDto.builder()
+                .transactionId("12ff5cdd-c4fa-4023-8b48-d3707917e32e")
+                .paymentMethod(PaymentMethod.CARD)
+                .amount(BigDecimal.valueOf(100))
+                .currency("BYN")
+                .cardData(CardDataUtils.getIvanIvanovCardDto(TranType.TOPUP))
+                .language("en")
+                .notificationUrl("http://localhost:8081/api/v1/webhooks/topup")
+                .customer(CustomerDataUtils.getCustomerIvanovDto())
+                .status(TranStatus.SUCCESS)
+                .message("OK")
+                .createdAt(DateTimeUtils.getCreatedAt())
+                .updatedAt(DateTimeUtils.getUpdatedAt())
                 .build();
     }
 }

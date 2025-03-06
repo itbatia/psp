@@ -52,6 +52,8 @@ public class WebhookDataUtils {
                 .customer(CustomerDataUtils.getCustomerIvanovDto())
                 .status(TranStatus.SUCCESS)
                 .message("OK")
+                .createdAt(DateTimeUtils.getCreatedAt())
+                .updatedAt(DateTimeUtils.getUpdatedAt())
                 .build();
     }
 }

@@ -51,6 +51,7 @@ class TransactionServiceTest {
     @InjectMocks
     private TransactionServiceImpl transactionServiceUnderTest;
 
+    private static final BigDecimal BALANCE_BEFORE_10 = BigDecimal.valueOf(10);
     private static final BigDecimal BALANCE_BEFORE_1000 = BigDecimal.valueOf(1000);
     private static final BigDecimal TRANSACTION_AMOUNT_100 = BigDecimal.valueOf(100);
     private static final BigDecimal BALANCE_AFTER_900 = BALANCE_BEFORE_1000.subtract(TRANSACTION_AMOUNT_100);
@@ -72,7 +73,7 @@ class TransactionServiceTest {
         AccountEntity customerAccountEntityBeforeTrans = AccountDataUtils.getCustomerIvanovBYNAccountPersisted(BALANCE_BEFORE_1000);
         AccountEntity customerAccountEntityAfterTrans = AccountDataUtils.getCustomerIvanovBYNAccountPersisted(BALANCE_AFTER_900);
         AccountEntity merchantAccountEntity = AccountDataUtils.getMerchantSmirnovBYNAccountPersisted();
-        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionTransient();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
         String jsonTransactionDto = MapperUtils.toJson(transactionDto);
         TransactionEntity transactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(jsonTransactionDto);
         Response expectedResult = ResponseToMerchantDataUtils.getSuccessfulResponseToMerchant();
@@ -81,7 +82,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(cardEntity));
         BDDMockito.given(customerService.findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString()))
                 .willReturn(Mono.just(customerEntity));
-        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_USER_ID), anyString()))
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
                 .willReturn(Mono.just(customerAccountEntityBeforeTrans));
         BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
                 .willReturn(Mono.just(merchantAccountEntity));
@@ -104,7 +105,7 @@ class TransactionServiceTest {
         verify(cardService, times(1)).findByCardNumberAndExpDateAndCvv(anyString(), anyString(), anyInt());
         verify(customerService).findByFirstNameAndLastNameAndCountry(CustomerDataUtils.IVANOV_FIRST_NAME, CustomerDataUtils.IVANOV_LAST_NAME, CustomerDataUtils.IVANOV_COUNTRY);
         verify(customerService, times(1)).findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString());
-        verify(accountService).findByUserIdAndCurrency(UserDataUtils.CUSTOMER_USER_ID, transactionDto.getCurrency());
+        verify(accountService).findByUserIdAndCurrency(UserDataUtils.CUSTOMER_IVANOV_USER_ID, transactionDto.getCurrency());
         verify(accountService).findByUserIdAndCurrency(UserDataUtils.MERCHANT_USER_ID, transactionDto.getCurrency());
         verify(accountService, times(2)).findByUserIdAndCurrency(anyLong(), anyString());
         verify(accountService).update(customerAccountEntityAfterTrans);
@@ -135,7 +136,7 @@ class TransactionServiceTest {
         AccountEntity customerAccountEntity = AccountDataUtils.getCustomerIvanovBYNAccountPersisted();
         AccountEntity merchantAccountEntityBeforeTrans = AccountDataUtils.getMerchantSmirnovBYNAccountPersisted(BALANCE_BEFORE_1000);
         AccountEntity merchantAccountEntityAfterTrans = AccountDataUtils.getMerchantSmirnovBYNAccountPersisted(BALANCE_AFTER_900);
-        TransactionDto transactionDto = TransactionDataUtils.getIvanovPayoutTransactionTransient();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovPayoutTransactionDtoIN();
         String jsonTransactionDto = MapperUtils.toJson(transactionDto);
         TransactionEntity transactionEntity = TransactionDataUtils.getIvanovPayoutTransactionPersisted(jsonTransactionDto);
         Response expectedResult = ResponseToMerchantDataUtils.getSuccessfulResponseToMerchant();
@@ -144,7 +145,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(cardEntity));
         BDDMockito.given(customerService.findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString()))
                 .willReturn(Mono.just(customerEntity));
-        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_USER_ID), anyString()))
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
                 .willReturn(Mono.just(customerAccountEntity));
         BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
                 .willReturn(Mono.just(merchantAccountEntityBeforeTrans));
@@ -167,7 +168,7 @@ class TransactionServiceTest {
         verify(cardService, times(1)).findByCardNumber(anyString());
         verify(customerService).findByFirstNameAndLastNameAndCountry(CustomerDataUtils.IVANOV_FIRST_NAME, CustomerDataUtils.IVANOV_LAST_NAME, CustomerDataUtils.IVANOV_COUNTRY);
         verify(customerService, times(1)).findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString());
-        verify(accountService).findByUserIdAndCurrency(UserDataUtils.CUSTOMER_USER_ID, transactionDto.getCurrency());
+        verify(accountService).findByUserIdAndCurrency(UserDataUtils.CUSTOMER_IVANOV_USER_ID, transactionDto.getCurrency());
         verify(accountService).findByUserIdAndCurrency(UserDataUtils.MERCHANT_USER_ID, transactionDto.getCurrency());
         verify(accountService, times(2)).findByUserIdAndCurrency(anyLong(), anyString());
         verify(accountService).update(merchantAccountEntityAfterTrans);
@@ -188,10 +189,10 @@ class TransactionServiceTest {
 
     @Test
     @DisplayName("Test create topup transaction with incorrect curd number functionality")
-    void givenTransactionDtoWithIncorrectCurdNumberAndMerchantId_whenCreateTopupTransaction_thenResponseWithStatusFailedReturned() {
+    void givenTransactionDtoWithIncorrectCardNumber_whenCreateTopupTransaction_thenResponseWithStatusFailedReturned() {
         //given
         CustomerEntity customerEntity = CustomerDataUtils.getCustomerIvanovPersisted();
-        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionTransient();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
         Response expectedResult = ResponseToMerchantDataUtils.getNegativeResponse(ResponseToMerchantDataUtils.INVALID_CARD_DATA);
 
         BDDMockito.given(cardService.findByCardNumberAndExpDateAndCvv(anyString(), anyString(), anyInt()))
@@ -212,11 +213,37 @@ class TransactionServiceTest {
     }
 
     @Test
+    @DisplayName("Test create topup transaction with blocked card functionality")
+    void givenTransactionDtoWithBlockedCard_whenCreateTopupTransaction_thenResponseWithStatusFailedReturned() {
+        //given
+        CardEntity cardEntity = CardDataUtils.getBlockedIvanIvanovCardPersisted();
+        CustomerEntity customerEntity = CustomerDataUtils.getCustomerIvanovPersisted();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
+        Response expectedResult = ResponseToMerchantDataUtils.getNegativeResponse(ResponseToMerchantDataUtils.CARD_IS_BLOCKED);
+
+        BDDMockito.given(cardService.findByCardNumberAndExpDateAndCvv(anyString(), anyString(), anyInt()))
+                .willReturn(Mono.just(cardEntity));
+        BDDMockito.given(customerService.findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString()))
+                .willReturn(Mono.just(customerEntity));
+
+        //when
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+
+        //then
+        StepVerifier.create(actualResult)
+                .expectSubscription()
+                .expectNext(expectedResult)
+                .verifyComplete();
+        verify(accountService, never()).update(any(AccountEntity.class));
+        verify(transactionRepository, never()).saveTransaction(anyLong(), anyLong(), any(PaymentMethod.class), any(BigDecimal.class), any(TranType.class), anyString(), anyString(), anyString());
+    }
+
+    @Test
     @DisplayName("Test create topup transaction with incorrect customer first name functionality")
     void givenTransactionDtoWithIncorrectCustomerFirstName_whenCreateTopupTransaction_thenResponseWithStatusFailedReturned() {
         //given
         CardEntity cardEntity = CardDataUtils.getIvanIvanovCardPersisted();
-        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionTransient();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
         Response expectedResult = ResponseToMerchantDataUtils.getNegativeResponse(ResponseToMerchantDataUtils.INVALID_CUSTOMER_DATA);
 
         BDDMockito.given(cardService.findByCardNumberAndExpDateAndCvv(anyString(), anyString(), anyInt()))
@@ -243,7 +270,7 @@ class TransactionServiceTest {
         CardEntity cardEntity = CardDataUtils.getIvanIvanovCardPersisted();
         CustomerEntity customerEntity = CustomerDataUtils.getCustomerIvanovPersisted();
         AccountEntity merchantAccountEntity = AccountDataUtils.getMerchantSmirnovBYNAccountPersisted();
-        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionTransient();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
         Response expectedResult = ResponseToMerchantDataUtils.getNegativeResponse(ResponseToMerchantDataUtils.INVALID_ACCOUNT_DATA);
 
         BDDMockito.given(cardService.findByCardNumberAndExpDateAndCvv(anyString(), anyString(), anyInt()))
@@ -252,7 +279,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(customerEntity));
         BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
                 .willReturn(Mono.just(merchantAccountEntity));
-        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_USER_ID), anyString()))
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
                 .willReturn(Mono.error(new AccountNotFoundException("Account not found")));
 
         //when
@@ -267,35 +294,146 @@ class TransactionServiceTest {
         verify(transactionRepository, never()).saveTransaction(anyLong(), anyLong(), any(PaymentMethod.class), any(BigDecimal.class), any(TranType.class), anyString(), anyString(), anyString());
     }
 
+    @Test
+    @DisplayName("Test create topup transaction with incorrect currency functionality")
+    void givenTransactionDtoWithCustomerThatIsNotCardOwner_whenCreateTopupTransaction_thenResponseWithStatusFailedReturned() {
+        //given
+        CardEntity cardEntity = CardDataUtils.getPetrPetrovCardPersisted();
+        CustomerEntity customerEntity = CustomerDataUtils.getCustomerIvanovPersisted();
+        AccountEntity customerAccountEntity = AccountDataUtils.getCustomerIvanovBYNAccountPersisted();
+        AccountEntity merchantAccountEntity = AccountDataUtils.getMerchantSmirnovBYNAccountPersisted();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
+        Response expectedResult = ResponseToMerchantDataUtils.getNegativeResponse(ResponseToMerchantDataUtils.CUSTOMER_IS_NOT_OWNER_OF_THIS_CARD);
 
-//    @Test
-//    @DisplayName("Test create payout transaction functionality")
-//    void givenTransactionEntity_whenSendAndSaveWebhook_thenCompletedSuccessfully() {
-//
-//    }
-//
+        BDDMockito.given(cardService.findByCardNumberAndExpDateAndCvv(anyString(), anyString(), anyInt()))
+                .willReturn(Mono.just(cardEntity));
+        BDDMockito.given(customerService.findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString()))
+                .willReturn(Mono.just(customerEntity));
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
+                .willReturn(Mono.just(customerAccountEntity));
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
+                .willReturn(Mono.just(merchantAccountEntity));
+
+        //when
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+
+        //then
+        StepVerifier.create(actualResult)
+                .expectSubscription()
+                .expectNext(expectedResult)
+                .verifyComplete();
+        verify(accountService, never()).update(any(AccountEntity.class));
+        verify(transactionRepository, never()).saveTransaction(anyLong(), anyLong(), any(PaymentMethod.class), any(BigDecimal.class), any(TranType.class), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Test create topup transaction with customer insufficient funds functionality")
+    void givenTransactionDtoWithCustomerInsufficientFunds_whenCreateTopupTransaction_thenResponseWithStatusFailedReturned() {
+        //given
+        CardEntity cardEntity = CardDataUtils.getIvanIvanovCardPersisted();
+        CustomerEntity customerEntity = CustomerDataUtils.getCustomerIvanovPersisted();
+        AccountEntity customerAccountEntity = AccountDataUtils.getCustomerIvanovBYNAccountPersisted(BALANCE_BEFORE_10);
+        AccountEntity merchantAccountEntity = AccountDataUtils.getMerchantSmirnovBYNAccountPersisted();
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
+        Response expectedResult = ResponseToMerchantDataUtils.getNegativeResponse(ResponseToMerchantDataUtils.INSUFFICIENT_FUNDS);
+
+        BDDMockito.given(cardService.findByCardNumberAndExpDateAndCvv(anyString(), anyString(), anyInt()))
+                .willReturn(Mono.just(cardEntity));
+        BDDMockito.given(customerService.findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString()))
+                .willReturn(Mono.just(customerEntity));
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
+                .willReturn(Mono.just(customerAccountEntity));
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
+                .willReturn(Mono.just(merchantAccountEntity));
+
+        //when
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+
+        //then
+        StepVerifier.create(actualResult)
+                .expectSubscription()
+                .expectNext(expectedResult)
+                .verifyComplete();
+        verify(accountService, never()).update(any(AccountEntity.class));
+        verify(transactionRepository, never()).saveTransaction(anyLong(), anyLong(), any(PaymentMethod.class), any(BigDecimal.class), any(TranType.class), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Test get topup transaction by uid functionality")
+    void givenTransactionUid_whenGetById_thenTransactionIsReturned() throws JsonProcessingException {
+        //given
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
+        String jsonTransactionDto = MapperUtils.toJson(transactionDto);
+        TransactionEntity transactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(jsonTransactionDto);
+        String uid = transactionEntity.getTransactionId();
+
+        BDDMockito.given(transactionRepository.findById(anyString()))
+                .willReturn(Mono.just(transactionEntity));
+        BDDMockito.given(objectMapper.readValue(anyString(), eq(TransactionDto.class)))
+                .willReturn(transactionDto);
+
+        //when
+        Mono<TransactionDto> actualTransactionDto = transactionServiceUnderTest.getById(uid);
+
+        //then
+        TransactionDto expectedTransactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoOUT();
+        StepVerifier.create(actualTransactionDto)
+                .expectSubscription()
+                .expectNext(expectedTransactionDto)
+                .verifyComplete();
+        verify(objectMapper).readValue(jsonTransactionDto, TransactionDto.class);
+        verify(objectMapper, times(1)).readValue(anyString(), eq(TransactionDto.class));
+        verify(transactionRepository).findById(uid);
+        verify(transactionRepository, times(1)).findById(anyString());
+    }
+
 //    @Test
 //    @DisplayName("Test functionality")
 //    void getById() {
+    //given
+
+    //when
+
+    //then
 //    }
-//
+
 //    @Test
 //    @DisplayName("Test functionality")
 //    void getAllTransactionsForDays() {
+    //given
+
+    //when
+
+    //then
 //    }
-//
+
 //    @Test
 //    @DisplayName("Test functionality")
 //    void getTotalElementsByStatus() {
+    //given
+
+    //when
+
+    //then
 //    }
-//
+
 //    @Test
 //    @DisplayName("Test functionality")
 //    void findAllUnprocessedTransactions() {
+    //given
+
+    //when
+
+    //then
 //    }
-//
+
 //    @Test
 //    @DisplayName("Test functionality")
 //    void updateStatusAndMessage() {
+    //given
+
+    //when
+
+    //then
 //    }
 }

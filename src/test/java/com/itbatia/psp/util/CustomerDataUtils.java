@@ -23,7 +23,7 @@ public class CustomerDataUtils {
     public static CustomerEntity getCustomerIvanovPersisted() {
         return CustomerEntity.builder()
                 .id(1L)
-                .userId(UserDataUtils.CUSTOMER_USER_ID)
+                .userId(UserDataUtils.CUSTOMER_IVANOV_USER_ID)
                 .firstName(IVANOV_FIRST_NAME)
                 .lastName(IVANOV_LAST_NAME)
                 .country(IVANOV_COUNTRY)

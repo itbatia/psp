@@ -34,12 +34,25 @@ public class CardDataUtils {
                 .build();
     }
 
-    public static CardEntity getBlockedIvanIvanovCardTransient() {
+    public static CardEntity getPetrPetrovCardPersisted() {
         return CardEntity.builder()
+                .id(1L)
+                .accountId(AccountDataUtils.CUSTOMER_PETROV_BYN_ACCOUNT_ID)
+                .cardNumber("4102778822334893")
+                .expDate("08/26")
+                .cvv(211)
+                .cardStatus(CardStatus.ACTIVE)
+                .build();
+    }
+
+    public static CardEntity getBlockedIvanIvanovCardPersisted() {
+        return CardEntity.builder()
+                .id(1L)
+                .accountId(AccountDataUtils.CUSTOMER_IVANOV_BYN_ACCOUNT_ID)
                 .cardNumber(IVANOV_CARD_NUMBER)
                 .expDate(IVANOV_CARD_EXP_DATE)
                 .cvv(IVANOV_CARD_CVV)
-                .cardStatus(CardStatus.ACTIVE)
+                .cardStatus(CardStatus.BLOCKED)
                 .build();
     }
 

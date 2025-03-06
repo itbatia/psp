@@ -11,12 +11,12 @@ spring:
 config:
   processing:
     enabled: true     # Enable/disable of the processing simulation
-    interval: 10      # Interval of the processing transactions. Unit of measurements - minutes
+    interval: 100      # Interval of the processing transactions. Unit of measurements - minutes
     success-rate: 100 # Range 0-100 in percent. Example SUCCESS/FAILED: if '5' then 5/95, if '70' then 70/30 etc
     limit: 1000       # Maximum number of transactions retrieved from the DB for sending webhooks. Concept: limit/offset
   webhook:
     enabled: true    # Enable/disable of the webhooks sending to merchants
-    interval: 20     # Interval for sending webhooks to merchants. Unit of measurements - minutes
+    interval: 200     # Interval for sending webhooks to merchants. Unit of measurements - minutes
     max-attempt: 3   # Maximum number of attempts to send webhooks
     limit: 1         # Maximum number of transactions retrieved from the DB for sending webhooks. Concept: limit/offset
   rest:
