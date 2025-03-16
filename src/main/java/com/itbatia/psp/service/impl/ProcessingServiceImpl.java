@@ -79,7 +79,5 @@ public class ProcessingServiceImpl implements ProcessingService {
             transactionEntity.setStatus(TranStatus.SUCCESS);
         else
             transactionEntity.setStatus(TranStatus.FAILED);
-
-        transactionEntity.setUpdatedAt(OffsetDateTime.now());
     }
 }

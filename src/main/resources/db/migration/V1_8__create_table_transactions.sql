@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS data.transactions
     notification_url text        NOT NULL,
     language         varchar(2)  NOT NULL,
     status           varchar(11) NOT NULL    DEFAULT 'IN_PROGRESS',
-    message          text        NOT NULL    DEFAULT 'OK',
+    message          text                    DEFAULT NULL,
     request          jsonb       NOT NULL,
     created_at       timestamptz NOT NULL    DEFAULT CURRENT_TIMESTAMP,
     updated_at       timestamptz             DEFAULT NULL

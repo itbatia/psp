@@ -9,9 +9,8 @@ import com.itbatia.psp.enums.UserType;
  */
 public class UserDataUtils {
 
-    public static final long MERCHANT_USER_ID = 1;
+    public static final long MERCHANT_SMIRNOV_USER_ID = 1;
     public static final long CUSTOMER_IVANOV_USER_ID = 2;
-    public static final long CUSTOMER_PETROV_USER_ID = 3;
 
     public static UserEntity getUserMerchantTransient() {
         return UserEntity.builder()
@@ -22,22 +21,6 @@ public class UserDataUtils {
 
     public static UserEntity getUserCustomerTransient() {
         return UserEntity.builder()
-                .type(UserType.CUSTOMER)
-                .status(Status.ACTIVE)
-                .build();
-    }
-
-    public static UserEntity getUserMerchantPersisted() {
-        return UserEntity.builder()
-                .id(MERCHANT_USER_ID)
-                .type(UserType.MERCHANT)
-                .status(Status.ACTIVE)
-                .build();
-    }
-
-    public static UserEntity getUserCustomerPersisted() {
-        return UserEntity.builder()
-                .id(CUSTOMER_IVANOV_USER_ID)
                 .type(UserType.CUSTOMER)
                 .status(Status.ACTIVE)
                 .build();

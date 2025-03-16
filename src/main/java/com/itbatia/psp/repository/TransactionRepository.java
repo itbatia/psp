@@ -19,7 +19,8 @@ import java.time.OffsetDateTime;
 public interface TransactionRepository extends R2dbcRepository<TransactionEntity, String> {
 
     @Query("INSERT INTO data.transactions (account_id_from, account_id_to, payment_method, amount, type, notification_url, language, request) " +
-            "VALUES (:accountIdFrom, :accountIdTo, :paymentMethod, :amount, :tranType, :notificationUrl, :language, :request::jsonb) RETURNING *;")
+            "VALUES (:accountIdFrom, :accountIdTo, :paymentMethod, :amount, :tranType, :notificationUrl, :language, :request::jsonb) " +
+            "RETURNING *;")
     Mono<TransactionEntity> saveTransaction(Long accountIdFrom, Long accountIdTo, PaymentMethod paymentMethod, BigDecimal amount,
                                TranType tranType, String notificationUrl, String language, String request);
 
