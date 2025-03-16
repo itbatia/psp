@@ -153,13 +153,17 @@ public class TransactionServiceImpl implements TransactionService {
                 });
     }
 
+    private void printLog(String errorMsg) {
+        log.error("IN create - {}", errorMsg);
+    }
+
     //////---------------------------------------------  GET_BY_ID  ----------------------------------------------//////
 
     @Override
     public Mono<TransactionDto> getById(String transactionId) {
         return transactionRepository.findById(transactionId)
-                .map(this::toDto)
-                .switchIfEmpty(Mono.error(new TransactionNotFoundException("Transaction by id=" + transactionId + " not found")));
+                .switchIfEmpty(Mono.error(new TransactionNotFoundException("Transaction by id=" + transactionId + " not found")))
+                .map(this::toDto);
     }
 
     //////----------------------------------------------  GET_ALL  -----------------------------------------------//////
@@ -190,6 +194,8 @@ public class TransactionServiceImpl implements TransactionService {
         };
     }
 
+    //////---------------------------------------------  PROCESSING  ---------------------------------------------//////
+
     @Override
     public Mono<Long> getTotalElementsByStatus(TranStatus tranStatus) {
         return transactionRepository.countByStatus(tranStatus);
@@ -210,7 +216,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .then(Mono.just(transaction));
     }
 
-    //////-----------------------------------------------  MAPPER  -----------------------------------------------//////
+    //////----------------------------------------------  MAPPERS  -----------------------------------------------//////
 
     private TransactionDto toDto(TransactionEntity transactionEntity) throws JsonConversionException {
         TransactionDto dto = fromJson(transactionEntity.getRequest());
@@ -240,11 +246,5 @@ public class TransactionServiceImpl implements TransactionService {
             log.error("IN fromJson - Error while converting json to TransactionDto. Reason: {}", e.getMessage());
             throw new JsonConversionException("Internal server error");
         }
-    }
-
-    //////-----------------------------------------------  OTHER  ------------------------------------------------//////
-
-    private void printLog(String errorMsg) {
-        log.error("IN create - {}", errorMsg);
     }
 }

@@ -10,11 +10,13 @@ import java.util.List;
 public class MerchantDataUtils {
 
     public static final long MERCHANT_SMIRNOV_ID = 1;
+    public static final String MERCHANT_SMIRNOV_API_ID = "Smirnov";
+    public static final String OTHER_MERCHANT_API_ID = "Smirnoff";
     public static final String MERCHANT_SMIRNOV_ID_AS_STRING = "1";
 
     public static MerchantEntity getMerchantSmirnovTransient() {
         return MerchantEntity.builder()
-                .apiId("Smirnov")
+                .apiId(MERCHANT_SMIRNOV_API_ID)
                 .apiKey("123456789")
                 .ipAddresses(List.of("127.0.0.1", "0:0:0:0:0:0:0:1"))
                 .build();
@@ -23,7 +25,7 @@ public class MerchantDataUtils {
     public static MerchantEntity getMerchantSmirnovPersisted() {
         return MerchantEntity.builder()
                 .id(MERCHANT_SMIRNOV_ID)
-                .apiId("Smirnov")
+                .apiId(MERCHANT_SMIRNOV_API_ID)
                 .apiKey("123456789")
                 .ipAddresses(List.of("127.0.0.1", "0:0:0:0:0:0:0:1"))
                 .build();

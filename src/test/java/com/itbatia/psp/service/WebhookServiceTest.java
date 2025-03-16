@@ -47,7 +47,7 @@ public class WebhookServiceTest {
 
     private static final int MAX_ATTEMPTS = 3;
     private static final int WEBHOOK_LIMIT = 10;
-    private static final String NOTIFICATION_URL = "http://localhost:8081/api/v1/webhooks/topup";
+    private static final String NOTIFICATION_URL = ConstantUtils.TOPUP_NOTIFICATION_URL;
 
     @BeforeEach
     void setUp() {
@@ -102,8 +102,8 @@ public class WebhookServiceTest {
     @DisplayName("Test resend undelivered webhooks functionality")
     public void givenUndeliveredWebhooks_whenResendUndeliveredWebhooks_thenCompletedSuccessfully() throws JsonProcessingException {
         //given
-        String transactionId1 = "23c3050f-9339-4b3f-a394-2edce4eda242";
-        String transactionId2 = "34656365-4a75-4123-ac06-2ac1c0a5c16f";
+        String transactionId1 = TransactionDataUtils.TRANSACTION_UID_1;
+        String transactionId2 = TransactionDataUtils.TRANSACTION_UID_2;
         String jsonWebhookDto1 = MapperUtils.toJson(getWebhookDto(transactionId1));
         String jsonWebhookDto2 = MapperUtils.toJson(getWebhookDto(transactionId2));
         WebhookEntity webhookPersisted1 = WebhookDataUtils.getWebhookPersisted1(transactionId1, jsonWebhookDto1);
@@ -127,7 +127,9 @@ public class WebhookServiceTest {
         Mono<Void> result = webhookServiceUnderTest.resendUndeliveredWebhooks();
 
         //then
-        StepVerifier.create(result).verifyComplete();
+        StepVerifier.create(result)
+                .expectSubscription()
+                .verifyComplete();
         verify(webhookRepository).findAllUndeliveredWebhooks(MAX_ATTEMPTS, WEBHOOK_LIMIT);
         verify(webhookRepository, times(1)).findAllUndeliveredWebhooks(anyInt(), anyLong());
         verify(httpService).send(jsonWebhookDto1, NOTIFICATION_URL);

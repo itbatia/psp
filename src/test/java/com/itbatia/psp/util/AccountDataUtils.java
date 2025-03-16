@@ -15,7 +15,7 @@ public class AccountDataUtils {
     public static final long CUSTOMER_PETROV_BYN_ACCOUNT_ID = 4;
 
     public static AccountEntity getMerchantSmirnovBYNAccountPersisted() {
-        return buildMerchantSmirnovBYNAccountPersisted(BigDecimal.valueOf(1000));
+        return buildMerchantSmirnovBYNAccountPersisted(ConstantUtils.BALANCE_1000);
     }
 
     public static AccountEntity getMerchantSmirnovBYNAccountPersisted(BigDecimal balance) {
@@ -25,7 +25,7 @@ public class AccountDataUtils {
     private static AccountEntity buildMerchantSmirnovBYNAccountPersisted(BigDecimal balance) {
         return AccountEntity.builder()
                 .id(MERCHANT_SMIRNOV_BYN_ACCOUNT_ID)
-                .userId(UserDataUtils.MERCHANT_USER_ID)
+                .userId(UserDataUtils.MERCHANT_SMIRNOV_USER_ID)
                 .number("BY34MERCH030140012964136000716")
                 .balance(balance)
                 .currency("BYN")
@@ -33,7 +33,7 @@ public class AccountDataUtils {
     }
 
     public static AccountEntity getCustomerIvanovBYNAccountPersisted() {
-        return buildCustomerIvanovBYNAccountPersisted(BigDecimal.valueOf(1000));
+        return buildCustomerIvanovBYNAccountPersisted(ConstantUtils.BALANCE_1000);
     }
 
     public static AccountEntity getCustomerIvanovBYNAccountPersisted(BigDecimal balance) {
@@ -53,9 +53,9 @@ public class AccountDataUtils {
     public static AccountEntity getMerchantSmirnovRUBAccountPersisted() {
         return AccountEntity.builder()
                 .id(MERCHANT_SMIRNOV_RUB_ACCOUNT_ID)
-                .userId(UserDataUtils.MERCHANT_USER_ID)
+                .userId(UserDataUtils.MERCHANT_SMIRNOV_USER_ID)
                 .number("RU83MERCH361407000843083139443")
-                .balance(BigDecimal.valueOf(1000))
+                .balance(ConstantUtils.BALANCE_1000)
                 .currency("RUB")
                 .build();
     }
@@ -63,7 +63,7 @@ public class AccountDataUtils {
     public static AccountEntity getMerchantAccountTransient() {
         return AccountEntity.builder()
                 .number("BY34MERCH030140012964136000716")
-                .balance(BigDecimal.valueOf(1000))
+                .balance(ConstantUtils.BALANCE_1000)
                 .currency("BYN")
                 .build();
     }
@@ -71,8 +71,24 @@ public class AccountDataUtils {
     public static AccountEntity getCustomerAccountTransient() {
         return AccountEntity.builder()
                 .number("BY03CUSTOM30140900044303134462")
-                .balance(BigDecimal.valueOf(1000))
+                .balance(ConstantUtils.BALANCE_1000)
                 .currency("BYN")
+                .build();
+    }
+
+    public static AccountEntity getMerchantSmirnovBYNAccountTransient() {
+        return AccountEntity.builder()
+                .number("BY34MERCH030140012964136000716")
+                .balance(ConstantUtils.BALANCE_1000)
+                .currency("BYN")
+                .build();
+    }
+
+    public static AccountEntity getMerchantSmirnovRUBAccountTransient() {
+        return AccountEntity.builder()
+                .number("RU83MERCH361407000843083139443")
+                .balance(ConstantUtils.BALANCE_1000)
+                .currency("RUB")
                 .build();
     }
 }

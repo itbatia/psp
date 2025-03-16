@@ -8,10 +8,12 @@ import com.itbatia.psp.entity.CardEntity;
 import com.itbatia.psp.entity.CustomerEntity;
 import com.itbatia.psp.entity.TransactionEntity;
 import com.itbatia.psp.enums.PaymentMethod;
+import com.itbatia.psp.enums.TranStatus;
 import com.itbatia.psp.enums.TranType;
 import com.itbatia.psp.exception.AccountNotFoundException;
 import com.itbatia.psp.exception.CardNotFoundException;
 import com.itbatia.psp.exception.CustomerNotFoundException;
+import com.itbatia.psp.exception.TransactionNotFoundException;
 import com.itbatia.psp.model.Response;
 import com.itbatia.psp.repository.TransactionRepository;
 import com.itbatia.psp.service.impl.TransactionServiceImpl;
@@ -23,10 +25,13 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -56,14 +61,6 @@ class TransactionServiceTest {
     private static final BigDecimal TRANSACTION_AMOUNT_100 = BigDecimal.valueOf(100);
     private static final BigDecimal BALANCE_AFTER_900 = BALANCE_BEFORE_1000.subtract(TRANSACTION_AMOUNT_100);
 
-//    @BeforeEach
-//    void setUp() {
-//    }
-
-//    @AfterEach
-//    void tearDown() throws Exception {
-//    }
-
     @Test
     @DisplayName("Test create topup transaction functionality")
     void givenTransactionDtoAndMerchantId_whenCreateTopupTransaction_thenSuccessfulResponseReturned() throws JsonProcessingException {
@@ -84,7 +81,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(customerEntity));
         BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
                 .willReturn(Mono.just(customerAccountEntityBeforeTrans));
-        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_SMIRNOV_USER_ID), anyString()))
                 .willReturn(Mono.just(merchantAccountEntity));
         BDDMockito.given(accountService.update(any(AccountEntity.class)))
                 .willReturn(Mono.just(customerAccountEntityAfterTrans));
@@ -97,7 +94,7 @@ class TransactionServiceTest {
         Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
 
         //then
-        StepVerifier.create(actualResult)
+        StepVerifier.create(actualResult.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedResult)
                 .verifyComplete();
@@ -106,7 +103,7 @@ class TransactionServiceTest {
         verify(customerService).findByFirstNameAndLastNameAndCountry(CustomerDataUtils.IVANOV_FIRST_NAME, CustomerDataUtils.IVANOV_LAST_NAME, CustomerDataUtils.IVANOV_COUNTRY);
         verify(customerService, times(1)).findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString());
         verify(accountService).findByUserIdAndCurrency(UserDataUtils.CUSTOMER_IVANOV_USER_ID, transactionDto.getCurrency());
-        verify(accountService).findByUserIdAndCurrency(UserDataUtils.MERCHANT_USER_ID, transactionDto.getCurrency());
+        verify(accountService).findByUserIdAndCurrency(UserDataUtils.MERCHANT_SMIRNOV_USER_ID, transactionDto.getCurrency());
         verify(accountService, times(2)).findByUserIdAndCurrency(anyLong(), anyString());
         verify(accountService).update(customerAccountEntityAfterTrans);
         verify(accountService, times(1)).update(any(AccountEntity.class));
@@ -147,7 +144,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(customerEntity));
         BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
                 .willReturn(Mono.just(customerAccountEntity));
-        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_SMIRNOV_USER_ID), anyString()))
                 .willReturn(Mono.just(merchantAccountEntityBeforeTrans));
         BDDMockito.given(accountService.update(any(AccountEntity.class)))
                 .willReturn(Mono.just(merchantAccountEntityAfterTrans));
@@ -160,7 +157,7 @@ class TransactionServiceTest {
         Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.PAYOUT, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
 
         //then
-        StepVerifier.create(actualResult)
+        StepVerifier.create(actualResult.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedResult)
                 .verifyComplete();
@@ -169,7 +166,7 @@ class TransactionServiceTest {
         verify(customerService).findByFirstNameAndLastNameAndCountry(CustomerDataUtils.IVANOV_FIRST_NAME, CustomerDataUtils.IVANOV_LAST_NAME, CustomerDataUtils.IVANOV_COUNTRY);
         verify(customerService, times(1)).findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString());
         verify(accountService).findByUserIdAndCurrency(UserDataUtils.CUSTOMER_IVANOV_USER_ID, transactionDto.getCurrency());
-        verify(accountService).findByUserIdAndCurrency(UserDataUtils.MERCHANT_USER_ID, transactionDto.getCurrency());
+        verify(accountService).findByUserIdAndCurrency(UserDataUtils.MERCHANT_SMIRNOV_USER_ID, transactionDto.getCurrency());
         verify(accountService, times(2)).findByUserIdAndCurrency(anyLong(), anyString());
         verify(accountService).update(merchantAccountEntityAfterTrans);
         verify(accountService, times(1)).update(any(AccountEntity.class));
@@ -204,7 +201,7 @@ class TransactionServiceTest {
         Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
 
         //then
-        StepVerifier.create(actualResult)
+        StepVerifier.create(actualResult.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedResult)
                 .verifyComplete();
@@ -230,7 +227,7 @@ class TransactionServiceTest {
         Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
 
         //then
-        StepVerifier.create(actualResult)
+        StepVerifier.create(actualResult.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedResult)
                 .verifyComplete();
@@ -255,7 +252,7 @@ class TransactionServiceTest {
         Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
 
         //then
-        StepVerifier.create(actualResult)
+        StepVerifier.create(actualResult.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedResult)
                 .verifyComplete();
@@ -277,7 +274,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(cardEntity));
         BDDMockito.given(customerService.findByFirstNameAndLastNameAndCountry(anyString(), anyString(), anyString()))
                 .willReturn(Mono.just(customerEntity));
-        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_SMIRNOV_USER_ID), anyString()))
                 .willReturn(Mono.just(merchantAccountEntity));
         BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
                 .willReturn(Mono.error(new AccountNotFoundException("Account not found")));
@@ -286,7 +283,7 @@ class TransactionServiceTest {
         Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
 
         //then
-        StepVerifier.create(actualResult)
+        StepVerifier.create(actualResult.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedResult)
                 .verifyComplete();
@@ -311,14 +308,14 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(customerEntity));
         BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
                 .willReturn(Mono.just(customerAccountEntity));
-        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_SMIRNOV_USER_ID), anyString()))
                 .willReturn(Mono.just(merchantAccountEntity));
 
         //when
         Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
 
         //then
-        StepVerifier.create(actualResult)
+        StepVerifier.create(actualResult.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedResult)
                 .verifyComplete();
@@ -343,14 +340,14 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(customerEntity));
         BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.CUSTOMER_IVANOV_USER_ID), anyString()))
                 .willReturn(Mono.just(customerAccountEntity));
-        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_USER_ID), anyString()))
+        BDDMockito.given(accountService.findByUserIdAndCurrency(eq(UserDataUtils.MERCHANT_SMIRNOV_USER_ID), anyString()))
                 .willReturn(Mono.just(merchantAccountEntity));
 
         //when
         Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
 
         //then
-        StepVerifier.create(actualResult)
+        StepVerifier.create(actualResult.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedResult)
                 .verifyComplete();
@@ -360,7 +357,7 @@ class TransactionServiceTest {
 
     @Test
     @DisplayName("Test get topup transaction by uid functionality")
-    void givenTransactionUid_whenGetById_thenTransactionIsReturned() throws JsonProcessingException {
+    void givenTransactionUid_whenGetTransactionById_thenTransactionIsReturned() throws JsonProcessingException {
         //given
         TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
         String jsonTransactionDto = MapperUtils.toJson(transactionDto);
@@ -377,7 +374,7 @@ class TransactionServiceTest {
 
         //then
         TransactionDto expectedTransactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoOUT();
-        StepVerifier.create(actualTransactionDto)
+        StepVerifier.create(actualTransactionDto.doOnNext(System.out::println))
                 .expectSubscription()
                 .expectNext(expectedTransactionDto)
                 .verifyComplete();
@@ -387,53 +384,139 @@ class TransactionServiceTest {
         verify(transactionRepository, times(1)).findById(anyString());
     }
 
-//    @Test
-//    @DisplayName("Test functionality")
-//    void getById() {
-    //given
+    @Test
+    @DisplayName("Test get topup transaction by incorrect uid functionality")
+    void givenIncorrectTransactionUid_whenGetTransactionById_thenExceptionIsThrown() {
+        //given
+        String uid = TransactionDataUtils.TRANSACTION_UID_1;
 
-    //when
+        BDDMockito.given(transactionRepository.findById(anyString()))
+                .willReturn(Mono.empty());
 
-    //then
-//    }
+        //when
+        Mono<TransactionDto> actualTransactionDto = transactionServiceUnderTest.getById(uid);
 
-//    @Test
-//    @DisplayName("Test functionality")
-//    void getAllTransactionsForDays() {
-    //given
+        //then
+        StepVerifier.create(actualTransactionDto.doOnNext(System.out::println))
+                .expectSubscription()
+                .expectError(TransactionNotFoundException.class)
+                .verify();
+        verify(transactionRepository).findById(uid);
+        verify(transactionRepository, times(1)).findById(anyString());
+    }
 
-    //when
+    @Test
+    @DisplayName("Test get all transactions for days functionality")
+    void givenRequestData_whenGetTransactionById_thenExceptionIsThrown() throws JsonProcessingException {
+        //given
+        TranType tranType = TranType.TOPUP;
+        Long userId = UserDataUtils.MERCHANT_SMIRNOV_USER_ID;
+        LocalDate startDate = ConstantUtils.START_DATE;
+        LocalDate endDate = ConstantUtils.END_DATE;
+        AccountEntity merchantBYNAccountEntity = AccountDataUtils.getMerchantSmirnovBYNAccountPersisted();
+        AccountEntity merchantRUBAccountEntity = AccountDataUtils.getMerchantSmirnovRUBAccountPersisted();
+        TransactionDto ivanovTransactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
+        TransactionDto petrovTransactionDto = TransactionDataUtils.getPetrovTopupTransactionDtoIN();
+        String ivanovJsonTransactionDto = MapperUtils.toJson(ivanovTransactionDto);
+        String petrovJsonTransactionDto = MapperUtils.toJson(petrovTransactionDto);
+        TransactionEntity ivanovTransactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(ivanovJsonTransactionDto);
+        TransactionEntity petrovTransactionEntity = TransactionDataUtils.getPetrovTopupTransactionPersisted(petrovJsonTransactionDto);
 
-    //then
-//    }
+        TransactionDto ivanovTopupTransactionDtoOUT = TransactionDataUtils.getIvanovTopupTransactionDtoOUT();
+        TransactionDto petrovTopupTransactionDtoOUT = TransactionDataUtils.getPetrovTopupTransactionDtoOUT();
 
-//    @Test
-//    @DisplayName("Test functionality")
-//    void getTotalElementsByStatus() {
-    //given
+        BDDMockito.given(accountService.findByUserId(anyLong()))
+                .willReturn(Flux.just(merchantBYNAccountEntity, merchantRUBAccountEntity));
+        BDDMockito.given(transactionRepository.findAllByAccountIdToAndCreatedAtBetween(eq(AccountDataUtils.MERCHANT_SMIRNOV_BYN_ACCOUNT_ID), any(OffsetDateTime.class), any(OffsetDateTime.class)))
+                .willReturn(Flux.just(ivanovTransactionEntity));
+        BDDMockito.given(transactionRepository.findAllByAccountIdToAndCreatedAtBetween(eq(AccountDataUtils.MERCHANT_SMIRNOV_RUB_ACCOUNT_ID), any(OffsetDateTime.class), any(OffsetDateTime.class)))
+                .willReturn(Flux.just(petrovTransactionEntity));
+        BDDMockito.given(objectMapper.readValue(eq(ivanovJsonTransactionDto), eq(TransactionDto.class)))
+                .willReturn(ivanovTransactionDto);
+        BDDMockito.given(objectMapper.readValue(eq(petrovJsonTransactionDto), eq(TransactionDto.class)))
+                .willReturn(petrovTransactionDto);
 
-    //when
+        //when
+        Flux<TransactionDto> actualTransactions = transactionServiceUnderTest.getAllTransactionsForDays(tranType, userId, startDate, endDate);
 
-    //then
-//    }
+        //then
+        StepVerifier.create(actualTransactions.doOnNext(System.out::println))
+                .expectSubscription()
+                .expectNext(ivanovTopupTransactionDtoOUT, petrovTopupTransactionDtoOUT)
+                .verifyComplete();
+        verify(accountService).findByUserId(UserDataUtils.MERCHANT_SMIRNOV_USER_ID);
+        verify(accountService, times(1)).findByUserId(anyLong());
+        verify(transactionRepository).findAllByAccountIdToAndCreatedAtBetween(eq(AccountDataUtils.MERCHANT_SMIRNOV_BYN_ACCOUNT_ID), any(OffsetDateTime.class), any(OffsetDateTime.class));
+        verify(transactionRepository).findAllByAccountIdToAndCreatedAtBetween(eq(AccountDataUtils.MERCHANT_SMIRNOV_RUB_ACCOUNT_ID), any(OffsetDateTime.class), any(OffsetDateTime.class));
+        verify(transactionRepository, times(2)).findAllByAccountIdToAndCreatedAtBetween(anyLong(), any(OffsetDateTime.class), any(OffsetDateTime.class));
+        verify(objectMapper).readValue(eq(ivanovJsonTransactionDto), eq(TransactionDto.class));
+        verify(objectMapper).readValue(eq(petrovJsonTransactionDto), eq(TransactionDto.class));
+        verify(objectMapper, times(2)).readValue(anyString(), eq(TransactionDto.class));
+    }
 
-//    @Test
-//    @DisplayName("Test functionality")
-//    void findAllUnprocessedTransactions() {
-    //given
+    @Test
+    @DisplayName("Test get total elements by status functionality")
+    void givenStatus_whenDetTotalElementsByStatus_thenTotalElementsReturned() {
+        //given
+        TranStatus tranStatus = TranStatus.IN_PROGRESS;
+        long expectedTotalElements = 10;
 
-    //when
+        BDDMockito.given(transactionRepository.countByStatus(any(TranStatus.class)))
+                .willReturn(Mono.just(expectedTotalElements));
 
-    //then
-//    }
+        //when
+        Mono<Long> actualTotalElements = transactionServiceUnderTest.getTotalElementsByStatus(tranStatus);
 
-//    @Test
-//    @DisplayName("Test functionality")
-//    void updateStatusAndMessage() {
-    //given
+        //then
+        StepVerifier.create(actualTotalElements.doOnNext(System.out::println))
+                .expectSubscription()
+                .expectNext(expectedTotalElements)
+                .verifyComplete();
+        verify(transactionRepository).countByStatus(tranStatus);
+        verify(transactionRepository, times(1)).countByStatus(any(TranStatus.class));
+    }
 
-    //when
+    @Test
+    @DisplayName("Test find all unprocessed transactions functionality")
+    void givenLimit_whenFindAllUnprocessedTransactions_thenUnprocessedTransactionsReturned() throws JsonProcessingException {
+        //given
+        long limit = 2;
+        TransactionEntity ivanovTransactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted();
+        TransactionEntity petrovTransactionEntity = TransactionDataUtils.getPetrovTopupTransactionPersisted();
 
-    //then
-//    }
+        BDDMockito.given(transactionRepository.findAllUnprocessedTransactions(anyLong()))
+                .willReturn(Flux.just(ivanovTransactionEntity, petrovTransactionEntity));
+
+        //when
+        Flux<TransactionEntity> actualUnprocessedTransactions = transactionServiceUnderTest.findAllUnprocessedTransactions(limit);
+
+        //then
+        StepVerifier.create(actualUnprocessedTransactions.doOnNext(System.out::println))
+                .expectSubscription()
+                .expectNext(ivanovTransactionEntity, petrovTransactionEntity)
+                .verifyComplete();
+        verify(transactionRepository).findAllUnprocessedTransactions(limit);
+        verify(transactionRepository, times(1)).findAllUnprocessedTransactions(anyLong());
+    }
+
+    @Test
+    @DisplayName("Test update transaction status and message functionality")
+    void givenTransactionEntity_whenUpdateStatusAndMessage_thenGivenTransactionEntityReturned() throws JsonProcessingException {
+        //given
+        TransactionEntity transEntityToUpdate = TransactionDataUtils.getIvanovTopupTransactionPersisted();
+
+        BDDMockito.given(transactionRepository.updateStatusAndMessage(any(TranStatus.class), anyString(), anyString()))
+                .willReturn(Mono.empty());
+
+        //when
+        Mono<TransactionEntity> actualTransactionEntity = transactionServiceUnderTest.updateStatusAndMessage(transEntityToUpdate);
+
+        //then
+        StepVerifier.create(actualTransactionEntity.doOnNext(System.out::println))
+                .expectSubscription()
+                .expectNext(transEntityToUpdate)
+                .verifyComplete();
+        verify(transactionRepository).updateStatusAndMessage(transEntityToUpdate.getStatus(), transEntityToUpdate.getMessage(), transEntityToUpdate.getTransactionId());
+        verify(transactionRepository, times(1)).updateStatusAndMessage(any(TranStatus.class), anyString(), anyString());
+    }
 }

@@ -47,13 +47,13 @@ public class WebhookDataUtils {
                 .amount(BigDecimal.valueOf(100))
                 .currency("BYN")
                 .type(TranType.TOPUP)
-                .cardData(CardDataUtils.getIvanIvanovCardDto(TranType.TOPUP))
+                .cardData(CardDataUtils.getIvanovCardDto(TranType.TOPUP))
                 .language("en")
                 .customer(CustomerDataUtils.getCustomerIvanovDto())
                 .status(TranStatus.SUCCESS)
                 .message("OK")
-                .createdAt(DateTimeUtils.getCreatedAt())
-                .updatedAt(DateTimeUtils.getUpdatedAt())
+                .createdAt(ConstantUtils.CREATED_AT)
+                .updatedAt(ConstantUtils.UPDATED_AT)
                 .build();
     }
 }

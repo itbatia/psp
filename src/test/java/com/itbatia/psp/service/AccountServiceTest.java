@@ -112,8 +112,8 @@ public class AccountServiceTest {
         //when
         Mono<AccountEntity> result = accountServiceUnderTest.update(accountToUpdate);
         //then
-        StepVerifier.create(result)
-                .expectNextMatches(account -> Objects.equals(account, accountToUpdate))
+        StepVerifier.create(result.doOnNext(System.out::println))
+                .expectNext(accountToUpdate)
                 .verifyComplete();
         verify(accountRepository).save(accountToUpdate);
         verify(accountRepository, times(1)).save(any(AccountEntity.class));
