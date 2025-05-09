@@ -1,5 +1,6 @@
 package com.itbatia.psp.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.itbatia.psp.dto.WebhookDto;
 import com.itbatia.psp.entity.WebhookEntity;
 import com.itbatia.psp.enums.PaymentMethod;
@@ -18,7 +19,7 @@ public class WebhookDataUtils {
         return WebhookEntity.builder()
                 .id(1L)
                 .transactionId(transactionId)
-                .notificationUrl("http://localhost:8081/api/v1/webhooks/topup")
+                .notificationUrl(ConstantUtils.TOPUP_NOTIFICATION_URL)
                 .attempt(1)
                 .request(jsonWebhookDto)
                 .response(MerchantResponseDataUtils.getFailedMerchantResponseBody(transactionId))
@@ -31,7 +32,7 @@ public class WebhookDataUtils {
         return WebhookEntity.builder()
                 .id(2L)
                 .transactionId(transactionId)
-                .notificationUrl("http://localhost:8081/api/v1/webhooks/topup")
+                .notificationUrl(ConstantUtils.TOPUP_NOTIFICATION_URL)
                 .attempt(1)
                 .request(jsonWebhookDto)
                 .response(MerchantResponseDataUtils.getFailedMerchantResponseBody(transactionId))
@@ -54,6 +55,18 @@ public class WebhookDataUtils {
                 .message("OK")
                 .createdAt(ConstantUtils.CREATED_AT)
                 .updatedAt(ConstantUtils.UPDATED_AT)
+                .build();
+    }
+
+    public static WebhookEntity getWebhookTransient(String transactionId) throws JsonProcessingException {
+        return WebhookEntity.builder()
+                .transactionId(transactionId)
+                .notificationUrl(ConstantUtils.TOPUP_NOTIFICATION_URL)
+                .attempt(1)
+                .request(MapperUtils.toJson(getWebhookDto(transactionId)))
+                .response(MerchantResponseDataUtils.getFailedMerchantResponseBody(transactionId))
+                .responseStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .toResend(true)
                 .build();
     }
 }

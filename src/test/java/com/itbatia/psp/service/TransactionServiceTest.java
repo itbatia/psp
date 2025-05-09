@@ -91,7 +91,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(transactionEntity));
 
         //when
-        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID, transactionDto);
 
         //then
         StepVerifier.create(actualResult.doOnNext(System.out::println))
@@ -154,7 +154,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(transactionEntity));
 
         //when
-        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.PAYOUT, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.PAYOUT, MerchantDataUtils.MERCHANT_SMIRNOV_ID, transactionDto);
 
         //then
         StepVerifier.create(actualResult.doOnNext(System.out::println))
@@ -198,7 +198,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(customerEntity));
 
         //when
-        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID, transactionDto);
 
         //then
         StepVerifier.create(actualResult.doOnNext(System.out::println))
@@ -224,7 +224,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(customerEntity));
 
         //when
-        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID, transactionDto);
 
         //then
         StepVerifier.create(actualResult.doOnNext(System.out::println))
@@ -249,7 +249,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.error(new CustomerNotFoundException("Customer not found")));
 
         //when
-        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID, transactionDto);
 
         //then
         StepVerifier.create(actualResult.doOnNext(System.out::println))
@@ -280,7 +280,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.error(new AccountNotFoundException("Account not found")));
 
         //when
-        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID, transactionDto);
 
         //then
         StepVerifier.create(actualResult.doOnNext(System.out::println))
@@ -312,7 +312,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(merchantAccountEntity));
 
         //when
-        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID, transactionDto);
 
         //then
         StepVerifier.create(actualResult.doOnNext(System.out::println))
@@ -344,7 +344,7 @@ class TransactionServiceTest {
                 .willReturn(Mono.just(merchantAccountEntity));
 
         //when
-        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID_AS_STRING, transactionDto);
+        Mono<Response> actualResult = transactionServiceUnderTest.create(TranType.TOPUP, MerchantDataUtils.MERCHANT_SMIRNOV_ID, transactionDto);
 
         //then
         StepVerifier.create(actualResult.doOnNext(System.out::println))

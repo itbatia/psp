@@ -14,6 +14,9 @@ import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+/**
+ * @author Batsian_SV
+ */
 @DataR2dbcTest
 @ActiveProfiles("test")
 @Import(PostgreSQLTestcontainerConfig.class)

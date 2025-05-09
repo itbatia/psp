@@ -18,7 +18,7 @@ public class ResponseToMerchantDataUtils {
 
     public static Response getSuccessfulResponseToMerchant() {
         return Response.builder()
-                .transactionId("12ff5cdd-c4fa-4023-8b48-d3707917e32e")
+                .transactionId(TransactionDataUtils.TRANSACTION_UID_1)
                 .status(TranStatus.IN_PROGRESS)
                 .message("OK")
                 .build();

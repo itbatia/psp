@@ -15,7 +15,7 @@ import java.time.LocalDate;
  */
 public interface TransactionService {
 
-    Mono<Response> create(TranType tranType, String merchantId, TransactionDto dto);
+    Mono<Response> create(TranType tranType, long merchantUserId, TransactionDto dto);
 
     Mono<TransactionDto> getById(String transactionId);
 

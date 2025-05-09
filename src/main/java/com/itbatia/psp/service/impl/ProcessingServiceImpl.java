@@ -1,5 +1,6 @@
 package com.itbatia.psp.service.impl;
 
+import com.itbatia.psp.Utils.StringPool;
 import com.itbatia.psp.entity.TransactionEntity;
 import com.itbatia.psp.enums.TranStatus;
 import com.itbatia.psp.model.Pagination;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.OffsetDateTime;
 import java.util.Random;
 
 /**
@@ -75,9 +75,12 @@ public class ProcessingServiceImpl implements ProcessingService {
      * @apiNote Simulating the processing is a status update
      */
     private void processTransaction(TransactionEntity transactionEntity) {
-        if (random.nextInt(100) < successRate)
+        if (random.nextInt(100) < successRate) {
             transactionEntity.setStatus(TranStatus.SUCCESS);
-        else
+            transactionEntity.setMessage(StringPool.PAYMENT_SUCCESS);
+        } else {
             transactionEntity.setStatus(TranStatus.FAILED);
+            transactionEntity.setMessage(StringPool.PAYMENT_FAILED);
+        }
     }
 }
