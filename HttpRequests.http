@@ -1,0 +1,174 @@
+@baseUrl = http://localhost:8080
+@auth = U21pcm5vdl9BUElfSUQ6MTIzNDU2Nzg5
+
+#-------------------------------------------------------------------------------------------#
+#                                         REQUESTS                                          #
+#-------------------------------------------------------------------------------------------#
+
+### Create TOPUP-transaction for customer Ivanov (BY):
+
+POST {{baseUrl}}/api/v1/payments/topup
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+{
+    "payment_method": "CARD",
+    "amount": "200",
+    "currency": "BYN",
+    "card_data": {
+        "card_number": "9112831820410277",
+        "exp_date": "11/25",
+        "cvv": "566"
+    },
+    "language": "en",
+    "notification_url": "http://localhost:8081/api/v1/webhooks/topup",
+    "customer": {
+        "first_name": "Ivan",
+        "last_name": "Ivanov",
+        "country":"BY"
+    }
+ }
+
+### Create PAYOUT-transaction for customer Ivanov (BYN):
+
+POST {{baseUrl}}/api/v1/payments/payout
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+{
+  "payment_method": "CARD",
+  "amount": "100",
+  "currency": "BYN",
+  "card_data": {
+    "card_number": "9112831820410277"
+  },
+  "language": "en",
+  "notification_url": "http://localhost:8081/api/v1/webhooks/payout",
+  "customer": {
+    "first_name": "Ivan",
+    "last_name": "Ivanov",
+    "country":"BY"
+  }
+}
+
+### Create TOPUP-transaction for customer Petrov (RUB):
+
+POST {{baseUrl}}/api/v1/payments/topup
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+{
+  "payment_method": "CARD",
+  "amount": "100",
+  "currency": "RUB",
+  "card_data": {
+    "card_number": "4102778822334893",
+    "exp_date": "08/26",
+    "cvv": "211"
+  },
+  "language": "en",
+  "notification_url": "http://localhost:8081/api/v1/webhooks/topup",
+  "customer": {
+    "first_name": "Petr",
+    "last_name": "Petrov",
+    "country":"RU"
+  }
+}
+
+### Create PAYOUT-transaction for customer Petrov (RUB):
+
+POST {{baseUrl}}/api/v1/payments/payout
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+{
+  "payment_method": "CARD",
+  "amount": "300",
+  "currency": "RUB",
+  "card_data": {
+    "card_number": "4102778822334893"
+  },
+  "language": "en",
+  "notification_url": "http://localhost:8081/api/v1/webhooks/payout",
+  "customer": {
+    "first_name": "Petr",
+    "last_name": "Petrov",
+    "country":"RU"
+  }
+}
+
+### Gat all TOPUP without query params:
+
+GET {{baseUrl}}/api/v1/payments/topup/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+### Gat all PAYOUT without query params:
+
+GET {{baseUrl}}/api/v1/payments/payout/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+### Gat all TOPUP with query params (replaсe dates to actual ones):
+
+GET {{baseUrl}}/api/v1/payments/topup/list?start_date=2025-05-09&end_date=2025-06-09
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+### Gat all PAYOUT with query params (replaсe dates to actual ones):
+
+GET {{baseUrl}}/api/v1/payments/payout/list?start_date=2025-05-09&end_date=2025-06-09
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+### Gat TOPUP transaction details (replaсe transaction_id to actual one):
+
+GET {{baseUrl}}/api/v1/payments/topup/f22ea6bb-75cd-4061-a8f0-9327a020dbd2/details
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}
+
+### Gat PAYOUT transaction details (replaсe transaction_id to actual one):
+
+GET {{baseUrl}}/api/v1/payments/payout/f7900e06-3a99-4c3a-9a37-2416e6a85982/details
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+Accept-Encoding: UTF-8
+Connection: keep-alive
+Authorization: Basic {{auth}}

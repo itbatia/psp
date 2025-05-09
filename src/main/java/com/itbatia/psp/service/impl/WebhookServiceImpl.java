@@ -171,7 +171,7 @@ public class WebhookServiceImpl implements WebhookService {
     private Mono<HttpResponse> defaultHttpResponse(Throwable e) {
         log.error("IN sendAndSaveWebhook - Error during HTTP request to merchant: {}", e.getMessage());
         return Mono.just(HttpResponse.builder()
-                .body(String.format(ERROR_MSG, e.getMessage())) //TODO Женя. Если сервак мерча лежит, то такой вариант сойдёт?
+                .body(String.format(ERROR_MSG, e.getMessage()))
                 .statusCode(HttpStatusCode.valueOf(500))
                 .build());
     }

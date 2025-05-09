@@ -52,6 +52,7 @@ public class ProcessingServiceTest {
      * {@code StepVerifier.create(empty)} - создает верификатор для потока<br>
      * {@code expectSubscription()} - проверяет, что подписка на поток была успешно создана<br>
      * {@code verifyComplete()} - проверяет, что поток завершился корректно (получен сигнал onComplete).
+     *
      * @param successRate Range 0-100 in percent. Example SUCCESS/FAILED: if '5' then 5/95, if '70' then 70/30 etc
      * @throws JsonProcessingException if serialization via {@link org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper ObjectMapper} fails
      */

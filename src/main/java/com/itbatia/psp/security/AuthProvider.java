@@ -21,7 +21,6 @@ import static com.itbatia.psp.Utils.StringPool.*;
 @Component
 class AuthProvider {
 
-    //TODO Женя
     private static final String TEST = "test";
     private static final String ACTIVE_PROFILE = System.getProperty("spring.profiles.active", TEST);
 

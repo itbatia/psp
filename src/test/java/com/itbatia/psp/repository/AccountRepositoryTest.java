@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author Batsian_SV
  */
 @DataR2dbcTest
-@ActiveProfiles("test")
 @Import(PostgreSQLTestcontainerConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class AccountRepositoryTest {
