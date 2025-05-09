@@ -11,6 +11,8 @@ public interface StringPool {
     String END_DATE = "end_date";
     String TRANSACTION_ID = "transaction_id";
     String USER_ID = "user_id";
+    String PAYMENT_SUCCESS = "Payment completed successfully";
+    String PAYMENT_FAILED = "Payment failed";
 
     String INVALID_CREDENTIALS = "Invalid credentials";
     String INVALID_IP = "Invalid remote ip address";

@@ -60,26 +60,34 @@ public class AccountDataUtils {
                 .build();
     }
 
-    public static AccountEntity getMerchantAccountTransient() {
-        return AccountEntity.builder()
-                .number("BY34MERCH030140012964136000716")
-                .balance(ConstantUtils.BALANCE_1000)
-                .currency("BYN")
-                .build();
+    public static AccountEntity getCustomerAccountTransient() {
+        return buildCustomerAccountTransient(ConstantUtils.BALANCE_1000);
     }
 
-    public static AccountEntity getCustomerAccountTransient() {
+    public static AccountEntity getCustomerAccountTransient(BigDecimal balance) {
+        return buildCustomerAccountTransient(balance);
+    }
+
+    private static AccountEntity buildCustomerAccountTransient(BigDecimal balance) {
         return AccountEntity.builder()
                 .number("BY03CUSTOM30140900044303134462")
-                .balance(ConstantUtils.BALANCE_1000)
+                .balance(balance)
                 .currency("BYN")
                 .build();
     }
 
     public static AccountEntity getMerchantSmirnovBYNAccountTransient() {
+        return buildMerchantSmirnovBYNAccountTransient(ConstantUtils.BALANCE_1000);
+    }
+
+    public static AccountEntity getMerchantSmirnovBYNAccountTransient(BigDecimal balance) {
+        return buildMerchantSmirnovBYNAccountTransient(balance);
+    }
+
+    private static AccountEntity buildMerchantSmirnovBYNAccountTransient(BigDecimal balance) {
         return AccountEntity.builder()
                 .number("BY34MERCH030140012964136000716")
-                .balance(ConstantUtils.BALANCE_1000)
+                .balance(balance)
                 .currency("BYN")
                 .build();
     }

@@ -29,25 +29,27 @@ public class TransactionRestControllerV1 {
     private final TransactionService transactionService;
 
     @PostMapping("/topup")
-    public Mono<ResponseEntity<Response>> createTopup(@RequestHeader(MERCHANT_ID) String merchantId,
+    public Mono<ResponseEntity<Response>> createTopup(@RequestHeader(USER_ID) Long merchantUserId,
                                                       @RequestBody TransactionDto dto) {
-        return transactionService.create(TranType.TOPUP, merchantId, dto).flatMap(this::buildResponse);
+        return transactionService.create(TranType.TOPUP, merchantUserId, dto).flatMap(this::buildResponse);
     }
 
     @PostMapping("/payout")
-    public Mono<ResponseEntity<Response>> createPayout(@RequestHeader(MERCHANT_ID) String merchantId,
+    public Mono<ResponseEntity<Response>> createPayout(@RequestHeader(USER_ID) Long merchantUserId,
                                                        @RequestBody TransactionDto dto) {
-        return transactionService.create(TranType.PAYOUT, merchantId, dto).flatMap(this::buildResponse);
+        return transactionService.create(TranType.PAYOUT, merchantUserId, dto).flatMap(this::buildResponse);
     }
 
     @GetMapping("/topup/{transaction_id}/details")
-    public Mono<TransactionDto> getByIdTopupTransaction(@PathVariable(TRANSACTION_ID) String transactionId) {
-        return transactionService.getById(transactionId);
+    public Mono<ResponseEntity<TransactionDto>> getByIdTopupTransaction(@PathVariable(TRANSACTION_ID) String transactionId) {
+        return transactionService.getById(transactionId)
+                .flatMap(dto -> Mono.just(ResponseEntity.status(HttpStatus.OK).body(dto)));
     }
 
     @GetMapping("/payout/{transaction_id}/details")
-    public Mono<TransactionDto> getByIdPayoutTransaction(@PathVariable(TRANSACTION_ID) String transactionId) {
-        return transactionService.getById(transactionId);
+    public Mono<ResponseEntity<TransactionDto>> getByIdPayoutTransaction(@PathVariable(TRANSACTION_ID) String transactionId) {
+        return transactionService.getById(transactionId)
+                .flatMap(dto -> Mono.just(ResponseEntity.status(HttpStatus.OK).body(dto)));
     }
 
     @GetMapping("/topup/list")

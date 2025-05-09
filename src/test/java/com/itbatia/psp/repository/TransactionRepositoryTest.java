@@ -30,6 +30,9 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Batsian_SV
+ */
 @DataR2dbcTest
 @ActiveProfiles("test")
 @Import(PostgreSQLTestcontainerConfig.class)
@@ -48,9 +51,9 @@ class TransactionRepositoryTest {
     private UserEntity savedUserCustomer;
     private AccountEntity savedAccountMerchant;
     private AccountEntity savedAccountCustomer;
-    private TransactionEntity topupTransactionEntity1;
-    private TransactionEntity topupTransactionEntity2;
-    private TransactionEntity payoutTransactionEntity;
+    private TransactionEntity payoutTransactionEntity1;
+    private TransactionEntity payoutTransactionEntity2;
+    private TransactionEntity topupTransactionEntity;
 
     @BeforeEach
     void setUp() {
@@ -112,9 +115,9 @@ class TransactionRepositoryTest {
                 )
                 .expectSubscription()
                 .consumeNextWith(tuples -> {
-                    topupTransactionEntity1 = tuples.getT1();
-                    topupTransactionEntity2 = tuples.getT2();
-                    payoutTransactionEntity = tuples.getT3();
+                    payoutTransactionEntity1 = tuples.getT1();
+                    payoutTransactionEntity2 = tuples.getT2();
+                    topupTransactionEntity = tuples.getT3();
                 })
                 .verifyComplete();
     }
@@ -134,14 +137,14 @@ class TransactionRepositoryTest {
     @DisplayName("Test save transaction functionality")
     void givenTransactionData_whenSaveTransaction_thenTransactionIsCreated() {
         //given
-        long accountIdFrom = topupTransactionEntity1.getAccountIdFrom();
-        long accountIdTo = topupTransactionEntity1.getAccountIdTo();
-        PaymentMethod paymentMethod = topupTransactionEntity1.getPaymentMethod();
-        BigDecimal amount = topupTransactionEntity1.getAmount();
-        TranType type = topupTransactionEntity1.getType();
-        String notificationUrl = topupTransactionEntity1.getNotificationUrl();
-        String language = topupTransactionEntity1.getLanguage();
-        String request = topupTransactionEntity1.getRequest();
+        long accountIdFrom = payoutTransactionEntity1.getAccountIdFrom();
+        long accountIdTo = payoutTransactionEntity1.getAccountIdTo();
+        PaymentMethod paymentMethod = payoutTransactionEntity1.getPaymentMethod();
+        BigDecimal amount = payoutTransactionEntity1.getAmount();
+        TranType type = payoutTransactionEntity1.getType();
+        String notificationUrl = payoutTransactionEntity1.getNotificationUrl();
+        String language = payoutTransactionEntity1.getLanguage();
+        String request = payoutTransactionEntity1.getRequest();
 
         //when
         Mono<TransactionEntity> transactionEntity = transactionRepositoryUnderTest.saveTransaction(
@@ -205,11 +208,11 @@ class TransactionRepositoryTest {
     @DisplayName("Test update Status and Message of a transaction functionality")
     void givenStatusAndMessageAnd_whenUpdateStatusAndMessage_thenTransactionStatusAndMessageAreUpdated() {
         //given
-        String transactionId = payoutTransactionEntity.getTransactionId();
-        TranStatus currentTranStatus = payoutTransactionEntity.getStatus();
-        String currentMessage = payoutTransactionEntity.getMessage();
+        String transactionId = topupTransactionEntity.getTransactionId();
+        TranStatus currentTranStatus = topupTransactionEntity.getStatus();
+        String currentMessage = topupTransactionEntity.getMessage();
         TranStatus newTranStatus = TranStatus.SUCCESS;
-        String newMessage = ConstantUtils.OK;
+        String newMessage = ConstantUtils.PAYMENT_SUCCESS;
         assertNotEquals(currentTranStatus, newTranStatus, "Invalid status to test");
         assertNotEquals(currentMessage, newMessage, "Invalid message to test");
 
@@ -226,8 +229,8 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    @DisplayName("Test find all by AccountIdTo and CreatedAt between DateFrom and DateTo functionality")
-    void givenAccountIdToAndDateFromAndDateTo_whenFindAllByAccountIdToAndCreatedAtBetween_thenTransactionAreReturned() {
+    @DisplayName("Test find all transactions by AccountIdTo and CreatedAt between DateFrom and DateTo functionality")
+    void givenAccountIdToAndDateFromAndDateTo_whenFindAllByAccountIdToAndCreatedAtBetween_thenTransactionsAreReturned() {
         //given
         LocalDate dateFrom = LocalDate.now().minusDays(1);
         LocalDate dateTo = LocalDate.now();
@@ -235,9 +238,9 @@ class TransactionRepositoryTest {
         OffsetDateTime start = OffsetDateTime.of(dateFrom, LocalTime.MIN, ZoneOffset.UTC);
         OffsetDateTime end = OffsetDateTime.of(dateTo, LocalTime.MAX, ZoneOffset.UTC);
 
-        long accountIdTo1 = topupTransactionEntity1.getAccountIdTo(); // customer's accountId
-        long accountIdTo2 = topupTransactionEntity2.getAccountIdTo(); // customer's accountId
-        long accountIdTo3 = payoutTransactionEntity.getAccountIdTo(); // merchant's accountId
+        long accountIdTo1 = payoutTransactionEntity1.getAccountIdTo(); // customer's accountId
+        long accountIdTo2 = payoutTransactionEntity2.getAccountIdTo(); // customer's accountId
+        long accountIdTo3 = topupTransactionEntity.getAccountIdTo();   // merchant's accountId
         assertEquals(accountIdTo1, accountIdTo2, "Invalid AccountIdTo to test");
         assertNotEquals(accountIdTo1, accountIdTo3, "Invalid AccountIdTo to test");
 
@@ -252,6 +255,42 @@ class TransactionRepositoryTest {
                 .expectNextCount(2)
                 .verifyComplete();
         StepVerifier.create(transactionsForMerchant)
+                .expectSubscription()
+                .expectNextCount(1)
+                .verifyComplete();
+        StepVerifier.create(transactionsForEmptyRange)
+                .expectSubscription()
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    @DisplayName("Test find all transactions by AccountIdFrom and CreatedAt between DateFrom and DateTo functionality")
+    void givenAccountIdFromAndDateFromAndDateTo_whenFindAllByAccountIdFromAndCreatedAtBetween_thenTransactionsAreReturned() {
+        //given
+        LocalDate dateFrom = LocalDate.now().minusDays(1);
+        LocalDate dateTo = LocalDate.now();
+
+        OffsetDateTime start = OffsetDateTime.of(dateFrom, LocalTime.MIN, ZoneOffset.UTC);
+        OffsetDateTime end = OffsetDateTime.of(dateTo, LocalTime.MAX, ZoneOffset.UTC);
+
+        long accountIdFrom1 = payoutTransactionEntity1.getAccountIdFrom(); // merchant's accountId
+        long accountIdFrom2 = payoutTransactionEntity2.getAccountIdFrom(); // merchant's accountId
+        long accountIdFrom3 = topupTransactionEntity.getAccountIdFrom();   // customer's accountId
+        assertEquals(accountIdFrom1, accountIdFrom2, "Invalid AccountIdFrom to test");
+        assertNotEquals(accountIdFrom1, accountIdFrom3, "Invalid AccountIdFrom to test");
+
+        //when
+        Flux<TransactionEntity> payoutTransactions = transactionRepositoryUnderTest.findAllByAccountIdFromAndCreatedAtBetween(accountIdFrom1, start, end);
+        Flux<TransactionEntity> topupTransactions = transactionRepositoryUnderTest.findAllByAccountIdFromAndCreatedAtBetween(accountIdFrom3, start, end);
+        Flux<TransactionEntity> transactionsForEmptyRange = transactionRepositoryUnderTest.findAllByAccountIdFromAndCreatedAtBetween(accountIdFrom2, start.minusDays(1), end.minusDays(1));
+
+        //then
+        StepVerifier.create(payoutTransactions)
+                .expectSubscription()
+                .expectNextCount(2)
+                .verifyComplete();
+        StepVerifier.create(topupTransactions)
                 .expectSubscription()
                 .expectNextCount(1)
                 .verifyComplete();

@@ -42,7 +42,7 @@ public class SchedulerConfig {
     }
 
     private Flux<Void> transactionsProcessing() {
-        return Flux.interval(Duration.ofSeconds(processingInterval), Schedulers.boundedElastic())
+        return Flux.interval(Duration.ofSeconds(processingInterval), Schedulers.boundedElastic()) //TODO ofMinutes
                 .filter(tick -> processingEnabled)
                 .doOnNext(empty -> log.info("IN transactionsProcessing - Transaction processing. Start ..."))
                 .flatMap(tick -> processingService.processTransactions());

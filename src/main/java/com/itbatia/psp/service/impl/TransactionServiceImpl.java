@@ -44,7 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Mono<Response> create(TranType tranType, String merchantId, TransactionDto transactionDto) {
+    public Mono<Response> create(TranType tranType, long merchantUserId, TransactionDto transactionDto) {
 
         CardDto card = transactionDto.getCardData();
         CustomerDto customer = transactionDto.getCustomer();
@@ -68,7 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
 
                     return Mono.zip(
                                     findCustomerAccount(customerEntity.getUserId(), currency),
-                                    findMerchantAccount(merchantId, currency)
+                                    findMerchantAccount(merchantUserId, currency)
                             )
                             .flatMap(accounts -> {
                                 AccountEntity customerAccount = accounts.getT1();
@@ -145,8 +145,8 @@ public class TransactionServiceImpl implements TransactionService {
                 });
     }
 
-    private Mono<AccountEntity> findMerchantAccount(String merchantId, String currency) {
-        return accountService.findByUserIdAndCurrency(Long.parseLong(merchantId), currency)
+    private Mono<AccountEntity> findMerchantAccount(long userId, String currency) {
+        return accountService.findByUserIdAndCurrency(userId, currency)
                 .onErrorResume(AccountNotFoundException.class, e -> {
                     printLog(e.getMessage());
                     return Mono.just(new AccountEntity());
@@ -176,6 +176,10 @@ public class TransactionServiceImpl implements TransactionService {
         }
         OffsetDateTime start = toOffsetDateTime(startDate, LocalTime.MIN);
         OffsetDateTime end = toOffsetDateTime(endDate, LocalTime.MAX);
+
+        //TODO del
+        System.out.println("start = " + start);
+        System.out.println("end = " + end);
 
         return accountService
                 .findByUserId(userId)

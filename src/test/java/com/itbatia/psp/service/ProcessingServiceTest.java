@@ -65,10 +65,10 @@ public class ProcessingServiceTest {
 
         TransactionEntity inProgressIvanovTransactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(TranStatus.IN_PROGRESS);
         TransactionEntity inProgressPetrovTransactionEntity = TransactionDataUtils.getPetrovTopupTransactionPersisted(TranStatus.IN_PROGRESS);
-        TransactionEntity successfulIvanovTransactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(TranStatus.SUCCESS);
-        TransactionEntity successfulPetrovTransactionEntity = TransactionDataUtils.getPetrovTopupTransactionPersisted(TranStatus.SUCCESS);
-        TransactionEntity failedIvanovTransactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(TranStatus.FAILED);
-        TransactionEntity failedPetrovTransactionEntity = TransactionDataUtils.getPetrovTopupTransactionPersisted(TranStatus.FAILED);
+        TransactionEntity successfulIvanovTransactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(TranStatus.SUCCESS, ConstantUtils.PAYMENT_SUCCESS);
+        TransactionEntity successfulPetrovTransactionEntity = TransactionDataUtils.getPetrovTopupTransactionPersisted(TranStatus.SUCCESS, ConstantUtils.PAYMENT_SUCCESS);
+        TransactionEntity failedIvanovTransactionEntity = TransactionDataUtils.getIvanovTopupTransactionPersisted(TranStatus.FAILED, ConstantUtils.PAYMENT_FAILED);
+        TransactionEntity failedPetrovTransactionEntity = TransactionDataUtils.getPetrovTopupTransactionPersisted(TranStatus.FAILED, ConstantUtils.PAYMENT_FAILED);
 
         BDDMockito.given(transactionService.getTotalElementsByStatus(any(TranStatus.class)))
                 .willReturn(Mono.just(totalElements));

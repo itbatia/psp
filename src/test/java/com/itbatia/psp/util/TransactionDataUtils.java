@@ -21,15 +21,57 @@ public class TransactionDataUtils {
     public static final String TRANSACTION_UID_3 = "34656365-4a75-4123-ac06-2ac1c0a5c16f";
 
     public static TransactionDto getIvanovTopupTransactionDtoIN() {
-        return getIvanovTransactionDto(TranType.TOPUP);
+        return buildIvanovTransactionDto(TranType.TOPUP, AMOUNT_100);
+    }
+
+    public static TransactionDto getIvanovTopupTransactionDtoIN(BigDecimal amount) {
+        return buildIvanovTransactionDto(TranType.TOPUP, amount);
+    }
+
+    public static TransactionDto getIvanovPayoutTransactionDtoIN() {
+        return buildIvanovTransactionDto(TranType.PAYOUT, AMOUNT_100);
+    }
+
+    private static TransactionDto buildIvanovTransactionDto(TranType tranType, BigDecimal amount) {
+        String notificationUrl = switch (tranType) {
+            case TOPUP -> TOPUP_NOTIFICATION_URL;
+            case PAYOUT -> PAYOUT_NOTIFICATION_URL;
+        };
+
+        return TransactionDto.builder()
+                .paymentMethod(PaymentMethod.CARD)
+                .amount(amount)
+                .currency(BYN)
+                .cardData(CardDataUtils.getIvanovCardDto(tranType))
+                .language(EN)
+                .notificationUrl(notificationUrl)
+                .customer(CustomerDataUtils.getCustomerIvanovDto())
+                .build();
     }
 
     public static TransactionDto getPetrovTopupTransactionDtoIN() {
         return getPetrovTransactionDto(TranType.TOPUP);
     }
 
-    public static TransactionDto getIvanovPayoutTransactionDtoIN() {
-        return getIvanovTransactionDto(TranType.PAYOUT);
+    public static TransactionDto getPetrovPayoutTransactionDtoIN() {
+        return getPetrovTransactionDto(TranType.PAYOUT);
+    }
+
+    private static TransactionDto getPetrovTransactionDto(TranType tranType) {
+        String notificationUrl = switch (tranType) {
+            case TOPUP -> TOPUP_NOTIFICATION_URL;
+            case PAYOUT -> PAYOUT_NOTIFICATION_URL;
+        };
+
+        return TransactionDto.builder()
+                .paymentMethod(PaymentMethod.CARD)
+                .amount(AMOUNT_100)
+                .currency(RUB)
+                .cardData(CardDataUtils.getPetrovCardDto(tranType))
+                .language(EN)
+                .notificationUrl(notificationUrl)
+                .customer(CustomerDataUtils.getCustomerPetrovDto())
+                .build();
     }
 
     public static TransactionEntity getIvanovTopupTransactionPersisted() throws JsonProcessingException {
@@ -41,14 +83,20 @@ public class TransactionDataUtils {
     public static TransactionEntity getIvanovTopupTransactionPersisted(TranStatus tranStatus) throws JsonProcessingException {
         TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
         String jsonTransactionDto = MapperUtils.toJson(transactionDto);
-        return getIvanovTopupTransactionPersisted(jsonTransactionDto, tranStatus);
+        return getIvanovTopupTransactionPersisted(jsonTransactionDto, tranStatus, OK);
     }
 
     public static TransactionEntity getIvanovTopupTransactionPersisted(String jsonTransactionDto) {
-        return getIvanovTopupTransactionPersisted(jsonTransactionDto, TranStatus.SUCCESS);
+        return getIvanovTopupTransactionPersisted(jsonTransactionDto, TranStatus.SUCCESS, OK);
     }
 
-    public static TransactionEntity getIvanovTopupTransactionPersisted(String jsonTransactionDto, TranStatus tranStatus) {
+    public static TransactionEntity getIvanovTopupTransactionPersisted(TranStatus tranStatus, String message) throws JsonProcessingException {
+        TransactionDto transactionDto = TransactionDataUtils.getIvanovTopupTransactionDtoIN();
+        String jsonTransactionDto = MapperUtils.toJson(transactionDto);
+        return getIvanovTopupTransactionPersisted(jsonTransactionDto, tranStatus, message);
+    }
+
+    public static TransactionEntity getIvanovTopupTransactionPersisted(String jsonTransactionDto, TranStatus tranStatus, String message) {
         return TransactionEntity.builder()
                 .transactionId(TRANSACTION_UID_1)
                 .accountIdFrom(AccountDataUtils.CUSTOMER_IVANOV_BYN_ACCOUNT_ID)
@@ -59,7 +107,7 @@ public class TransactionDataUtils {
                 .notificationUrl(TOPUP_NOTIFICATION_URL)
                 .language(EN)
                 .status(tranStatus)
-                .message(OK)
+                .message(message)
                 .request(jsonTransactionDto)
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
@@ -75,14 +123,20 @@ public class TransactionDataUtils {
     public static TransactionEntity getPetrovTopupTransactionPersisted(TranStatus tranStatus) throws JsonProcessingException {
         TransactionDto transactionDto = TransactionDataUtils.getPetrovTopupTransactionDtoIN();
         String jsonTransactionDto = MapperUtils.toJson(transactionDto);
-        return getPetrovTopupTransactionPersisted(jsonTransactionDto, tranStatus);
+        return getPetrovTopupTransactionPersisted(jsonTransactionDto, tranStatus, OK);
     }
 
     public static TransactionEntity getPetrovTopupTransactionPersisted(String jsonTransactionDto) {
-        return getPetrovTopupTransactionPersisted(jsonTransactionDto, TranStatus.SUCCESS);
+        return getPetrovTopupTransactionPersisted(jsonTransactionDto, TranStatus.SUCCESS, OK);
     }
 
-    public static TransactionEntity getPetrovTopupTransactionPersisted(String jsonTransactionDto, TranStatus tranStatus) {
+    public static TransactionEntity getPetrovTopupTransactionPersisted(TranStatus tranStatus, String message) throws JsonProcessingException {
+        TransactionDto transactionDto = TransactionDataUtils.getPetrovTopupTransactionDtoIN();
+        String jsonTransactionDto = MapperUtils.toJson(transactionDto);
+        return getPetrovTopupTransactionPersisted(jsonTransactionDto, tranStatus, message);
+    }
+
+    public static TransactionEntity getPetrovTopupTransactionPersisted(String jsonTransactionDto, TranStatus tranStatus, String message) {
         return TransactionEntity.builder()
                 .transactionId(TRANSACTION_UID_2)
                 .accountIdFrom(AccountDataUtils.CUSTOMER_PETROV_BYN_ACCOUNT_ID)
@@ -93,7 +147,7 @@ public class TransactionDataUtils {
                 .notificationUrl(TOPUP_NOTIFICATION_URL)
                 .language(EN)
                 .status(tranStatus)
-                .message(OK)
+                .message(message)
                 .request(jsonTransactionDto)
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
@@ -118,37 +172,29 @@ public class TransactionDataUtils {
                 .build();
     }
 
-    private static TransactionDto getIvanovTransactionDto(TranType tranType) {
+    public static TransactionDto getIvanovTopupTransactionDtoOUT() {
+        return getIvanovTransactionDtoOUT(TranType.TOPUP, TRANSACTION_UID_1);
+    }
+
+    public static TransactionDto getIvanovPayoutTransactionDtoOUT() {
+        return getIvanovTransactionDtoOUT(TranType.PAYOUT, TRANSACTION_UID_1);
+    }
+
+    public static TransactionDto getIvanovTopupTransactionDtoOUT(String transactionUid) {
+        return getIvanovTransactionDtoOUT(TranType.TOPUP, transactionUid);
+    }
+
+    public static TransactionDto getIvanovPayoutTransactionDtoOUT(String transactionUid) {
+        return getIvanovTransactionDtoOUT(TranType.PAYOUT, transactionUid);
+    }
+
+    private static TransactionDto getIvanovTransactionDtoOUT(TranType tranType, String transactionUid) {
         return TransactionDto.builder()
+                .transactionId(transactionUid)
                 .paymentMethod(PaymentMethod.CARD)
                 .amount(AMOUNT_100)
                 .currency(BYN)
                 .cardData(CardDataUtils.getIvanovCardDto(tranType))
-                .language(EN)
-                .notificationUrl(TOPUP_NOTIFICATION_URL)
-                .customer(CustomerDataUtils.getCustomerIvanovDto())
-                .build();
-    }
-
-    private static TransactionDto getPetrovTransactionDto(TranType tranType) {
-        return TransactionDto.builder()
-                .paymentMethod(PaymentMethod.CARD)
-                .amount(AMOUNT_100)
-                .currency(RUB)
-                .cardData(CardDataUtils.getPetrovCardDto(tranType))
-                .language(EN)
-                .notificationUrl(TOPUP_NOTIFICATION_URL)
-                .customer(CustomerDataUtils.getCustomerPetrovDto())
-                .build();
-    }
-
-    public static TransactionDto getIvanovTopupTransactionDtoOUT() {
-        return TransactionDto.builder()
-                .transactionId(TRANSACTION_UID_1)
-                .paymentMethod(PaymentMethod.CARD)
-                .amount(AMOUNT_100)
-                .currency(BYN)
-                .cardData(CardDataUtils.getIvanovCardDto(TranType.TOPUP))
                 .language(EN)
                 .notificationUrl(TOPUP_NOTIFICATION_URL)
                 .customer(CustomerDataUtils.getCustomerIvanovDto())
@@ -173,21 +219,6 @@ public class TransactionDataUtils {
                 .message(OK)
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
-                .build();
-    }
-
-    public static TransactionEntity getPetrovTopupTransactionTransient(long accountIdFrom, long accountIdTo, TranType tranType) {
-        return TransactionEntity.builder()
-                .accountIdFrom(accountIdFrom)
-                .accountIdTo(accountIdTo)
-                .paymentMethod(PaymentMethod.CARD)
-                .amount(AMOUNT_100)
-                .type(TranType.TOPUP)
-                .notificationUrl(TOPUP_NOTIFICATION_URL)
-                .language(EN)
-                .status(TranStatus.IN_PROGRESS)
-                .message(OK)
-                .request(MOCK_REQUEST)
                 .build();
     }
 }
