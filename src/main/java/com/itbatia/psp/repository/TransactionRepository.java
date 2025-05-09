@@ -22,7 +22,7 @@ public interface TransactionRepository extends R2dbcRepository<TransactionEntity
             "VALUES (:accountIdFrom, :accountIdTo, :paymentMethod, :amount, :tranType, :notificationUrl, :language, :request::jsonb) " +
             "RETURNING *;")
     Mono<TransactionEntity> saveTransaction(Long accountIdFrom, Long accountIdTo, PaymentMethod paymentMethod, BigDecimal amount,
-                               TranType tranType, String notificationUrl, String language, String request);
+                                            TranType tranType, String notificationUrl, String language, String request);
 
     Mono<Long> countByStatus(TranStatus status);
 

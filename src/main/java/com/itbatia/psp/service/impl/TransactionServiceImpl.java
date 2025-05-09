@@ -177,10 +177,6 @@ public class TransactionServiceImpl implements TransactionService {
         OffsetDateTime start = toOffsetDateTime(startDate, LocalTime.MIN);
         OffsetDateTime end = toOffsetDateTime(endDate, LocalTime.MAX);
 
-        //TODO del
-        System.out.println("start = " + start);
-        System.out.println("end = " + end);
-
         return accountService
                 .findByUserId(userId)
                 .flatMap(accountEntity -> getAllTransByCondition(tranType, accountEntity.getId(), start, end)

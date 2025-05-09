@@ -119,9 +119,6 @@ class TransactionServiceTest {
                 transactionDto.getLanguage(),
                 jsonTransactionDto);
         verify(transactionRepository, times(1)).saveTransaction(anyLong(), anyLong(), any(PaymentMethod.class), any(BigDecimal.class), any(TranType.class), anyString(), anyString(), anyString());
-        //TODO Женя: пройти по then
-        //TODO Женя: в verify все проверки сводятся, что метод был вызван с определёнными данными и только указанное количество раз. Может что-то ещё надо?
-        //TODO Женя: как тесты юзаются перед продом?
     }
 
     @Test
@@ -183,6 +180,8 @@ class TransactionServiceTest {
                 jsonTransactionDto);
         verify(transactionRepository, times(1)).saveTransaction(anyLong(), anyLong(), any(PaymentMethod.class), any(BigDecimal.class), any(TranType.class), anyString(), anyString(), anyString());
     }
+
+
 
     @Test
     @DisplayName("Test create topup transaction with incorrect curd number functionality")
